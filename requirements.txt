@@ -20,3 +20,4 @@ jsonschema>=4.0
 python-multipart>=0.0.19
 python-dotenv>=1.0.0
 docker>=6.0
+PyYAML>=6.0

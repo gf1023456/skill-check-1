@@ -1,227 +1,125 @@
-import os
-import subprocess
-import time
-import socket
-import ipaddress
+"""Orchestrates validation and test execution for uploaded skills."""
+
 import json
-import httpx
-from urllib.parse import urlparse
+import shutil
+import tempfile
+import zipfile
 from pathlib import Path
-from pathlib import Path
-import zipfile, shutil, json
+from typing import Optional
+
+import yaml
+
+from ..agent.executor import Executor
+from ..agent.llm_agent import LlmAgent
 from ..agent.validator import Validator
-from ..agent.agent.llm_agent import LlmAgent
-from ..agent.agent.executor import Executor
-from ..utils.manifest_utils import load_manifest_from_workdir  # 或把函数顶置
-
-PRIVATE_NETWORKS = [
-    ipaddress.ip_network("10.0.0.0/8"),
-    ipaddress.ip_network("172.16.0.0/12"),
-    ipaddress.ip_network("192.168.0.0/16"),
-    ipaddress.ip_network("127.0.0.0/8"),
-    ipaddress.ip_network("169.254.0.0/16")
-]
-
-from ..core.config import settings
-
-def is_private_host(host: str) -> bool:
-    try:
-        infos = socket.getaddrinfo(host, None)
-        for info in infos:
-            addr = info[4][0]
-            ip = ipaddress.ip_address(addr)
-            for net in PRIVATE_NETWORKS:
-                if ip in net:
-                    return True
-    except Exception:
-        # treat unresolved hosts as unsafe by default
-        return True
-    return False
-
-class Executor:
-    def __init__(self, workdir: str, manifest: dict):
-        self.workdir = workdir
-        self.manifest = manifest
-        self.proc = None
-
-    def prepare_and_start(self) -> bool:
-        run = self.manifest.get("run")
-        if not run:
-            return False
-        cmd = run.get("command")
-        if not cmd:
-            return False
-        # start process (production: use docker container)
-        self.proc = subprocess.Popen(cmd, shell=True, cwd=self.workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        hc = run.get("healthcheck", {})
-        if hc:
-            url = hc.get("url")
-            timeout = hc.get("timeout", 5)
-            t0 = time.time()
-            while time.time() - t0 < timeout:
-                try:
-                    with httpx.Client(timeout=2) as c:
-                        r = c.get(url)
-                        if r.status_code < 400:
-                            return True
-                except Exception:
-                    time.sleep(0.5)
-            return False
-        return True
-
-    def teardown(self):
-        if self.proc:
-            try:
-                self.proc.terminate()
-                self.proc.wait(timeout=2)
-            except Exception:
-                self.proc.kill()
-
-    def run_manifest_tests(self):
-        results = []
-        entry = self.manifest.get("entrypoint", {})
-        for t in self.manifest.get("tests", []):
-            if entry.get("type") == "http":
-                try:
-                    method = entry.get("method", "POST").upper()
-                    with httpx.Client(timeout=8) as c:
-                        r = c.request(method, entry["url"], json=t.get("input", {}).get("json"))
-                    ok = True
-                    reasons = []
-                    exp = t.get("expected", {})
-                    if "status" in exp and r.status_code != exp["status"]:
-                        ok = False; reasons.append(f"status {r.status_code} != {exp['status']}")
-                    if "json_contains" in exp:
-                        try:
-                            body = r.json()
-                            for k,v in exp["json_contains"].items():
-                                if body.get(k) != v:
-                                    ok = False; reasons.append(f"body[{k}] mismatch")
-                        except Exception:
-                            ok = False; reasons.append("not json")
-                    results.append({"id": t.get("id"), "result": {"ok": ok, "status": r.status_code, "reasons": reasons}})
-                except Exception as e:
-                    results.append({"id": t.get("id"), "result": {"ok": False, "error": str(e)}})
-            else:
-                results.append({"id": t.get("id"), "result": {"ok": False, "error": "unsupported entry type for tests"}})
-        return results
-
-    def _safe_url(self, url: str):
-        parsed = urlparse(url)
-        host = parsed.hostname
-        if not host:
-            raise ValueError("URL has no hostname")
-        if is_private_host(host) and not settings.allow_private_network:
-            raise ValueError("private or unresolved host rejected: " + host)
-        # if allowed_hosts configured, ensure host in allowed set
-        if settings.allowed_hosts and host not in settings.allowed_hosts:
-            raise ValueError("host not in allowed_hosts")
-        return True
-
-    def execute_plan(self, plan: dict):
-        if not plan or not isinstance(plan, dict) or "actions" not in plan:
-            return {"actions": []}
-        results = []
-        for act in plan.get("actions", []):
-            aid = act.get("id")
-            typ = act.get("type")
-            if typ == "http":
-                url = act.get("url")
-                try:
-                    self._safe_url(url)
-                except Exception as e:
-                    results.append({"id": aid, "ok": False, "error": f"security: {e}"})
-                    continue
-                try:
-                    method = act.get("method", "POST").upper()
-                    with httpx.Client(timeout=8) as c:
-                        r = c.request(method, url, json=act.get("json"))
-                    ok = True
-                    reasons = []
-                    exp = act.get("expected", {})
-                    if "status" in exp and r.status_code != exp["status"]:
-                        ok = False; reasons.append(f"status {r.status_code} != {exp['status']}")
-                    if "json_contains" in exp:
-                        try:
-                            body = r.json()
-                            for k,v in exp["json_contains"].items():
-                                if body.get(k) != v:
-                                    ok = False; reasons.append(f"body[{k}] mismatch")
-                        except Exception:
-                            ok = False; reasons.append("response not json")
-                    results.append({"id": aid, "ok": ok, "status": r.status_code, "reasons": reasons, "resp_snippet": r.text[:1000]})
-                except Exception as e:
-                    results.append({"id": aid, "ok": False, "error": str(e)})
-            else:
-                results.append({"id": aid, "ok": False, "error": "unsupported action type in PoC"})
-        return {"actions": results}
+from ..utils.manifest_utils import load_manifest_from_workdir
 
 
 class SkillManager:
-    ...
-    def run_check_for_skill(self, skill_id: str, baseline_skill_id: Optional[str] = None):
+    def __init__(self, storage_root: Path = Path("/tmp/skill_checker_storage")):
+        self.storage_root = Path(storage_root)
+        self.storage_root.mkdir(parents=True, exist_ok=True)
+        self._status_dir = self.storage_root / "status"
+        self._report_dir = self.storage_root / "reports"
+        self._work_dir = self.storage_root / "work"
+        for directory in (self._status_dir, self._report_dir, self._work_dir):
+            directory.mkdir(parents=True, exist_ok=True)
+
+    def _id_dirs(self, skill_id: str):
+        return self._work_dir / skill_id, self._report_dir / f"{skill_id}.json", self._status_dir / f"{skill_id}.json"
+
+    @staticmethod
+    def _extract_zip(zip_path: Path, destination: Path) -> None:
+        """Extract an upload without allowing entries to escape its work directory."""
+        destination = destination.resolve()
+        with zipfile.ZipFile(zip_path) as archive:
+            for member in archive.infolist():
+                target = (destination / member.filename).resolve()
+                if target != destination and destination not in target.parents:
+                    raise ValueError("zip contains an unsafe path")
+            archive.extractall(destination)
+
+    @staticmethod
+    def _read_json(path: Path) -> Optional[dict]:
+        try:
+            value = json.loads(path.read_text(encoding="utf-8"))
+            return value if isinstance(value, dict) else None
+        except (OSError, json.JSONDecodeError):
+            return None
+
+    def get_status(self, skill_id: str) -> Optional[dict]:
+        return self._read_json(self._id_dirs(skill_id)[2])
+
+    def get_report(self, skill_id: str) -> Optional[dict]:
+        return self._read_json(self._id_dirs(skill_id)[1])
+
+    def run_check_for_skill(self, skill_id: str, baseline_skill_id: Optional[str] = None) -> None:
         workdir, report_path, status_path = self._id_dirs(skill_id)
-        status_path.write_text(json.dumps({"status":"running"}))
-        upload_dir = self.storage_root / skill_id
-        zip_path = upload_dir / "skill.zip"
-        if not zip_path.exists():
-            status_path.write_text(json.dumps({"status":"error","reason":"zip not found"})); return
-
-        # 解包
-        if workdir.exists(): shutil.rmtree(workdir)
-        workdir.mkdir(parents=True, exist_ok=True)
-        with zipfile.ZipFile(zip_path, 'r') as z: z.extractall(workdir)
-
-        # 加载 target manifest（尝试多种候选）
+        executor: Optional[Executor] = None
+        manifest_dir: Optional[Path] = None
         try:
+            status_path.write_text(json.dumps({"status": "running"}), encoding="utf-8")
+            zip_path = self.storage_root / skill_id / "skill.zip"
+            if not zip_path.is_file():
+                status_path.write_text(json.dumps({"status": "error", "reason": "zip not found"}), encoding="utf-8")
+                return
+
+            if workdir.exists():
+                shutil.rmtree(workdir)
+            workdir.mkdir(parents=True)
+            self._extract_zip(zip_path, workdir)
             target_manifest = load_manifest_from_workdir(workdir)
-        except FileNotFoundError:
-            status_path.write_text(json.dumps({"status":"error","reason":"manifest not found"})); return
+            if not isinstance(target_manifest, dict):
+                raise ValueError("manifest must be an object")
 
-        # 如果有 baseline_skill_id，解包并加载 baseline manifest
-        baseline_manifest = None
-        if baseline_skill_id:
-            baseline_upload_dir = self.storage_root / baseline_skill_id
-            baseline_zip = baseline_upload_dir / "skill.zip"
-            if baseline_zip.exists():
-                tmpb = tempfile.mkdtemp(prefix="baseline_")
-                with zipfile.ZipFile(baseline_zip, 'r') as z:
-                    z.extractall(tmpb)
-                try:
-                    baseline_manifest = load_manifest_from_workdir(tmpb)
-                except Exception:
-                    baseline_manifest = None
-                shutil.rmtree(tmpb)
-            else:
-                # baseline not found -> mark but continue
-                pass
+            baseline_manifest = self._load_baseline(baseline_skill_id)
+            manifest_dir = Path(tempfile.mkdtemp(prefix="skill-manifest-"))
+            manifest_path = manifest_dir / "skill-manifest.yaml"
+            manifest_path.write_text(yaml.safe_dump(target_manifest, allow_unicode=True), encoding="utf-8")
+            validator = Validator(str(manifest_path))
+            static = validator.run_static_checks()
 
-        # 静态校验（基于 target manifest）
-        validator = Validator(...)  # 传入 manifest path 或 manifest dict (可改 Validator 支持)
-        static = validator.run_static_checks()  # 也可改为接收 manifest dict
+            executor = Executor(str(workdir), target_manifest)
+            executor.prepare_and_start()
+            deterministic_tests = executor.run_manifest_tests()
 
-        # 启动 skill（如果有 run 命令）
-        execer = Executor(str(workdir), target_manifest)
-        execer.prepare_and_start()
+            try:
+                plan, raw = LlmAgent().request_test_plan(
+                    target_manifest, triggers=target_manifest.get("triggers") or [], baseline=baseline_manifest
+                )
+            except Exception as error:
+                plan, raw = None, f"llm error: {error}"
 
-        # 运行 deterministic tests
-        det_results = execer.run_manifest_tests()
+            plan_results = executor.execute_plan(plan or {})
+            report = {
+                "skill": target_manifest.get("name") or skill_id,
+                "static": static,
+                "deterministic_tests": deterministic_tests,
+                "llm_plan_raw": raw,
+                "plan_results": plan_results,
+                "trace": validator.compute_trace(static, deterministic_tests, plan_results),
+            }
+            report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+            status_path.write_text(json.dumps({"status": "done"}), encoding="utf-8")
+        except Exception as error:
+            status_path.write_text(json.dumps({"status": "error", "reason": str(error)}), encoding="utf-8")
+        finally:
+            if manifest_dir:
+                shutil.rmtree(manifest_dir, ignore_errors=True)
+            if executor:
+                executor.teardown()
 
-        # 向 LLM 请求测试计划并把 baseline 传入
-        llm = LlmAgent()
-        triggers = target_manifest.get("triggers", [])
-        try:
-            plan, raw = llm.request_test_plan(target_manifest, triggers=triggers, baseline=baseline_manifest)
-        except Exception as e:
-            plan = None; raw = f"llm error: {e}"
-
-        # 执行 plan
-        plan_results = execer.execute_plan(plan or {})
-
-        # 计算 trace
-        trace = validator.compute_trace(static, det_results, plan_results)
-
-        report = {...}
-        report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2))
-        status_path.write_text(json.dumps({"status":"done"}))
-        execer.teardown()
+    def _load_baseline(self, baseline_skill_id: Optional[str]) -> Optional[dict]:
+        if not baseline_skill_id:
+            return None
+        zip_path = self.storage_root / baseline_skill_id / "skill.zip"
+        if not zip_path.is_file():
+            return None
+        with tempfile.TemporaryDirectory(prefix="baseline-") as directory:
+            destination = Path(directory)
+            self._extract_zip(zip_path, destination)
+            try:
+                manifest = load_manifest_from_workdir(destination)
+            except (FileNotFoundError, OSError, ValueError, yaml.YAMLError):
+                return None
+            return manifest if isinstance(manifest, dict) else None
