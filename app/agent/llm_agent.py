@@ -3,6 +3,7 @@
 import json
 import os
 import time
+from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List, Optional, Tuple
 
 import httpx
@@ -116,6 +117,68 @@ class LlmAgent:
             raise RuntimeError("Local LLM URL not configured")
         return self._call_prompt_endpoint(url, prompt, timeout=60)
 
+    def _call_model(self, messages: List[Dict[str, str]]) -> str:
+        """Send one agent task to the configured provider."""
+        prompt = messages[-1]["content"]
+        if self.provider == "openai":
+            return self._call_openai(messages)
+        if self.provider == "deepseek":
+            return self._call_deepseek(prompt)
+        if self.provider == "anthropic":
+            return self._call_anthropic(prompt)
+        if self.provider == "azure":
+            return self._call_azure(messages)
+        if self.provider == "local":
+            return self._call_local(prompt)
+        raise RuntimeError(f"unsupported LLM provider: {self.provider}")
+
+    def generate_trigger_evals(self, skill_name: str, description: str, skill_body: str) -> list[dict]:
+        """Ask the validation agent for the core skill's balanced trigger set."""
+        messages = [{
+            "role": "system",
+            "content": (
+                "You are the Skill Checker evaluation agent. Generate exactly 20 realistic user queries "
+                "for trigger evaluation: 10 with should_trigger=true and 10 with should_trigger=false. "
+                "Negative examples must be close, plausible distractions. Return JSON only: "
+                "{\"evals\":[{\"query\":string,\"should_trigger\":boolean}]}"
+            ),
+        }, {
+            "role": "user",
+            "content": json.dumps({
+                "skill_name": skill_name, "description": description, "skill_body": skill_body[:12000],
+            }, ensure_ascii=False),
+        }]
+        data = self._extract_json(self._call_model(messages))
+        evals = data.get("evals")
+        if not isinstance(evals, list) or len(evals) != 20:
+            raise ValueError("trigger test set must contain exactly 20 queries")
+        normalized = []
+        for item in evals:
+            if not isinstance(item, dict) or not isinstance(item.get("query"), str) or not isinstance(item.get("should_trigger"), bool):
+                raise ValueError("invalid trigger test case")
+            normalized.append({"query": item["query"], "should_trigger": item["should_trigger"]})
+        if sum(item["should_trigger"] for item in normalized) != 10:
+            raise ValueError("trigger test set must contain 10 positive and 10 negative queries")
+        return normalized
+
+    def evaluate_trigger_queries(self, prompt_template: str, skill_name: str, description: str, evals: list[dict]) -> list[dict]:
+        """Execute all trigger decisions with the validation agent in parallel."""
+        def evaluate(item: dict) -> dict:
+            # The bundled template contains a literal JSON example, so use
+            # explicit token replacement instead of ``str.format``.
+            prompt = (prompt_template
+                      .replace("{skill_name}", skill_name)
+                      .replace("{skill_description}", description)
+                      .replace("{query}", item["query"]))
+            result = self._extract_json(self._call_model([{"role": "user", "content": prompt}]))
+            triggered = result.get("triggered")
+            if not isinstance(triggered, bool):
+                raise ValueError("trigger evaluation must return a boolean 'triggered' field")
+            return {**item, "triggered": triggered}
+
+        with ThreadPoolExecutor(max_workers=min(5, len(evals))) as pool:
+            return list(pool.map(evaluate, evals))
+
     def request_test_plan(
         self, manifest: dict, triggers: Optional[list] = None, baseline: Optional[dict] = None, max_retries: int = 2
     ) -> Tuple[dict, str]:
@@ -130,19 +193,7 @@ class LlmAgent:
 
         last_raw = ""
         for _ in range(max_retries + 1):
-            prompt = messages[-1]["content"]
-            if self.provider == "openai":
-                raw = self._call_openai(messages)
-            elif self.provider == "deepseek":
-                raw = self._call_deepseek(prompt)
-            elif self.provider == "anthropic":
-                raw = self._call_anthropic(prompt)
-            elif self.provider == "azure":
-                raw = self._call_azure(messages)
-            elif self.provider == "local":
-                raw = self._call_local(prompt)
-            else:
-                raise RuntimeError(f"unsupported LLM provider: {self.provider}")
+            raw = self._call_model(messages)
             last_raw = raw
             try:
                 plan = self._extract_json(raw)
