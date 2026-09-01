@@ -31,7 +31,7 @@ def load_manifest_from_workdir(workdir: str) -> Dict:
             return json.loads(text)
         if name.lower().endswith(".md") or name.lower().startswith("readme"):
             # 尝试提取 YAML frontmatter: ---\n ... \n---
-            m = re.search(r"^---\s*\\n(.*?)\\n---\\s*\\n", text, re.S)
+            m = re.search(r"^---\s*\n(.*?)\n---\s*(?:\n|$)", text, re.S)
             if m:
                 try:
                     return yaml.safe_load(m.group(1))

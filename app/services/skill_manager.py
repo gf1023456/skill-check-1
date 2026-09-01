@@ -12,6 +12,7 @@ import yaml
 from ..agent.executor import Executor
 from ..agent.llm_agent import LlmAgent
 from ..agent.validator import Validator
+from .core_skill import CoreSkillChecker
 from ..utils.manifest_utils import load_manifest_from_workdir
 
 
@@ -34,10 +35,20 @@ class SkillManager:
         destination = destination.resolve()
         with zipfile.ZipFile(zip_path) as archive:
             for member in archive.infolist():
-                target = (destination / member.filename).resolve()
+                # ZIP files created on Windows may use backslashes.  Normalize
+                # them before validating and writing paths on this POSIX host.
+                relative = Path(member.filename.replace("\\", "/"))
+                if relative.is_absolute():
+                    raise ValueError("zip contains an unsafe path")
+                target = (destination / relative).resolve()
                 if target != destination and destination not in target.parents:
                     raise ValueError("zip contains an unsafe path")
-            archive.extractall(destination)
+                if member.is_dir():
+                    target.mkdir(parents=True, exist_ok=True)
+                else:
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    with archive.open(member) as source, target.open("wb") as output:
+                        shutil.copyfileobj(source, output)
 
     @staticmethod
     def _read_json(path: Path) -> Optional[dict]:
@@ -68,6 +79,8 @@ class SkillManager:
                 shutil.rmtree(workdir)
             workdir.mkdir(parents=True)
             self._extract_zip(zip_path, workdir)
+            core_checker = CoreSkillChecker()
+            frontmatter = core_checker.validate_frontmatter(workdir)
             target_manifest = load_manifest_from_workdir(workdir)
             if not isinstance(target_manifest, dict):
                 raise ValueError("manifest must be an object")
@@ -91,13 +104,36 @@ class SkillManager:
                 plan, raw = None, f"llm error: {error}"
 
             plan_results = executor.execute_plan(plan or {})
+            dependencies = self._environment_dependencies(frontmatter)
+            environment = core_checker.summarize_environment(dependencies)
+            # This is a real agent evaluation of whether target-skill queries
+            # trigger the target skill; it is not a proxy based on HTTP tests.
+            # It is mandatory: no TRACE report is emitted if it cannot run.
+            evals, trigger = core_checker.evaluate_triggers(LlmAgent(), workdir, frontmatter)
+            warnings = sum(1 for issue in frontmatter.get("issues", []) if issue.get("severity") == "warn")
+            core_report = core_checker.merge_trace(
+                skill_name=target_manifest.get("name") or skill_id,
+                evals=evals,
+                trigger=trigger,
+                environment=environment,
+                frontmatter_valid=bool(frontmatter.get("valid")),
+                frontmatter_warnings=warnings,
+            )
             report = {
                 "skill": target_manifest.get("name") or skill_id,
+                "skill_checker": {
+                    "version": "bundled",
+                    "frontmatter": frontmatter,
+                    "environment": environment,
+                    "trigger": trigger,
+                    "trace_report": core_report,
+                },
                 "static": static,
                 "deterministic_tests": deterministic_tests,
                 "llm_plan_raw": raw,
                 "plan_results": plan_results,
-                "trace": validator.compute_trace(static, deterministic_tests, plan_results),
+                "legacy_trace": validator.compute_trace(static, deterministic_tests, plan_results),
+                "trace": core_report["trace"],
             }
             report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
             status_path.write_text(json.dumps({"status": "done"}), encoding="utf-8")
@@ -108,6 +144,32 @@ class SkillManager:
                 shutil.rmtree(manifest_dir, ignore_errors=True)
             if executor:
                 executor.teardown()
+
+    @staticmethod
+    def _environment_dependencies(frontmatter: dict) -> list[dict]:
+        """Translate declared dependencies into core skill environment findings."""
+        parsed = frontmatter.get("parsed") if isinstance(frontmatter, dict) else None
+        declared = parsed.get("dependencies", []) if isinstance(parsed, dict) else []
+        supported = {"bash", "file_system", "network", "python", "subprocess"}
+        dependencies = []
+        for name in declared if isinstance(declared, list) else []:
+            if not isinstance(name, str) or not name.strip():
+                continue
+            normalized = name.strip()
+            compatibility = "compatible" if normalized in supported else "unknown"
+            dependencies.append({
+                "category": "tool",
+                "name": normalized,
+                "description": f"Declared by the target skill: {normalized}",
+                "evidence": "frontmatter dependencies",
+                "compatibility": compatibility,
+                "reason": (
+                    "Available to the skill-checker service."
+                    if compatibility == "compatible"
+                    else "The service cannot verify this declared dependency."
+                ),
+            })
+        return dependencies
 
     def _load_baseline(self, baseline_skill_id: Optional[str]) -> Optional[dict]:
         if not baseline_skill_id:
