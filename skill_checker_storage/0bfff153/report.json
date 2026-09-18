@@ -1,0 +1,140 @@
+{
+  "skill_name": "html-ppt-zhangzara-grove",
+  "timestamp": "2026-09-02T09:51:38.071981+00:00",
+  "overall_score": 0.9,
+  "trace": {
+    "trust": {
+      "score": 1.0,
+      "label": "可信任度",
+      "verdict": "优秀",
+      "issues": []
+    },
+    "reliability": {
+      "score": 0.95,
+      "label": "可靠性",
+      "verdict": "优秀",
+      "issues": [
+        "有 1 项依赖需适配，增加不确定性"
+      ]
+    },
+    "adaptability": {
+      "score": 0.9,
+      "label": "适用性",
+      "verdict": "优秀",
+      "issues": [
+        "有 1 项需适配: webfonts"
+      ]
+    },
+    "convention": {
+      "score": 1.0,
+      "label": "规范性",
+      "verdict": "优秀",
+      "issues": []
+    },
+    "effectiveness": {
+      "score": 0,
+      "label": "有效性",
+      "verdict": "不合格",
+      "issues": []
+    },
+    "overall": 0.77,
+    "conclusion": "不可用，需修复",
+    "conclusion_detail": "存在不合格维度，必须先修复阻塞问题后才能使用"
+  },
+  "dimensions": {
+    "trigger": {
+      "status": "skipped"
+    },
+    "environment": {
+      "status": "checked",
+      "score": 0.9,
+      "dependencies": [
+        {
+          "category": "capability",
+          "name": "file-read",
+          "description": "读取 SKILL.md、example.html 和 open-design.json 文件",
+          "evidence": "SKILL.md 文件存在于 Skill 目录中",
+          "compatibility": "compatible",
+          "reason": "当前环境支持文件读取操作",
+          "adaptation": null
+        },
+        {
+          "category": "capability",
+          "name": "file-write",
+          "description": "将 example.html 克隆到用户的工作区并修改内容",
+          "evidence": "工作流步骤1: 将 example.html 克隆到用户的工作区作为工作文件",
+          "compatibility": "compatible",
+          "reason": "当前环境支持文件写入操作",
+          "adaptation": null
+        },
+        {
+          "category": "tool",
+          "name": "html-rendering",
+          "description": "HTML 模板的渲染和预览（由 example.html 和 preview 配置体现）",
+          "evidence": "preview.type: html, entry: example.html",
+          "compatibility": "compatible",
+          "reason": "当前环境支持 HTML 处理",
+          "adaptation": null
+        },
+        {
+          "category": "external_service",
+          "name": "webfonts",
+          "description": "Playfair 衬线字体和可能由外部托管的字体资源（需要网络连接）",
+          "evidence": "设计系统描述提到了 Playfair 衬线字体",
+          "compatibility": "adaptable",
+          "reason": "如果用户无法访问外部字体服务，可能需要降级方案",
+          "adaptation": {
+            "target_capability": "字体渲染",
+            "strategy": "wrap",
+            "description": "用本地字体或标准衬线字体替代外部托管的 Playfair 字体",
+            "changes": [
+              "在 HTML 中加入 @font-face 的备用字体声明",
+              "将远程字体链接替换为本地字体文件路径",
+              "添加 font-display: swap 以确保显示回退"
+            ]
+          }
+        },
+        {
+          "category": "external_service",
+          "name": "upstream-template",
+          "description": "GitHub 上游模板仓库（用于参考和可能的资源获取）",
+          "evidence": "上游: https://github.com/zarazhangrui/beautiful-html-templates/tree/main/templates/grove",
+          "compatibility": "compatible",
+          "reason": "上游只是参考，核心文件已经存在于 Skill 目录中",
+          "adaptation": null
+        }
+      ],
+      "summary": {
+        "total": 5,
+        "compatible": 4,
+        "adaptable": 1,
+        "incompatible": 0,
+        "blocking_issues": [],
+        "adaptations_available": [
+          "webfonts"
+        ],
+        "fitness_score": 0.9,
+        "script_verification": {
+          "claimed_features": [
+            "自包含的 HTML 滑板模板，包含排版、配色、装饰系统和幻灯片词汇",
+            "12 张幻灯片的演示示例",
+            "通过克隆 example.html 工作",
+            "通过复制布局来调整甲板长度",
+            "从零开始设计缺失布局的能力",
+            "保持导航运行时不变",
+            "MIT 许可证的模板",
+            "双语 EN/CN 报告支持"
+          ],
+          "actual_scripts": [
+            "SKILL.md",
+            "example.html",
+            "open-design.json"
+          ],
+          "missing_scripts": [],
+          "unimplemented_features": [],
+          "trust_issues": []
+        }
+      }
+    }
+  }
+}

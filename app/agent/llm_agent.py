@@ -13,8 +13,8 @@ from ..core.config import settings
 class LlmAgent:
     """Generate JSON test plans through the configured LLM provider."""
 
-    def __init__(self, model: str = "gpt-4o-mini"):
-        self.model = model
+    def __init__(self, model: Optional[str] = None):
+        self.model = model or settings.llm_model
         self.provider = settings.llm_provider.lower()
 
     def _build_messages(self, manifest: dict, triggers: Optional[list]) -> List[Dict[str, str]]:
@@ -85,8 +85,30 @@ class LlmAgent:
         api_key = settings.deepseek_api_key or os.getenv("DEEPSEEK_API_KEY")
         if not url:
             raise RuntimeError("DeepSeek URL not configured")
+        # DeepSeek V4 使用 chat/completions 端点，需要 messages 格式
+        if "/completions" in url and "/chat/" not in url:
+            chat_url = url.replace("/v1/completions", "/v1/chat/completions")
+        else:
+            chat_url = url
         headers = {"Authorization": f"Bearer {api_key}"} if api_key else None
-        return self._call_prompt_endpoint(url, prompt, headers)
+        with httpx.Client(timeout=30) as client:
+            response = client.post(
+                chat_url,
+                json={
+                    "model": self.model,
+                    "messages": [{"role": "user", "content": prompt}],
+                    "thinking": {"type": "disabled"}  # 直接作为顶级字段
+                },
+                headers=headers,
+            )
+            response.raise_for_status()
+            resp_json = response.json()
+            # DeepSeek 返回 choices[0].message.content
+            if resp_json.get("choices") and len(resp_json["choices"]) > 0:
+                choice = resp_json["choices"][0]
+                if choice.get("message") and choice["message"].get("content"):
+                    return choice["message"]["content"].strip()
+            return response.text
 
     def _call_anthropic(self, prompt: str) -> str:
         url = settings.anthropic_url or os.getenv("ANTHROPIC_URL") or "https://api.anthropic.com/v1/complete"

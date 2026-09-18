@@ -1,0 +1,15 @@
+{
+  "iPhone 15 Pro Max": {
+    "Geekbench Single": 2950,
+    "Geekbench Multi": 7850,
+    "AnTuTu": 1540000
+  },
+  "Samsung S24 Ultra": {
+    "Geekbench Single": 2500,
+    "AnTuTu": 1456000
+  },
+  "Pixel 9 Pro": {
+    "Geekbench Single": 2300,
+    "Geekbench Multi": 6900
+  }
+}

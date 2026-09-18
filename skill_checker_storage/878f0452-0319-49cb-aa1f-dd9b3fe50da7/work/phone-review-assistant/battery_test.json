@@ -1,0 +1,21 @@
+{
+  "phone": "iPhone 15 Pro",
+  "battery_capacity": 3274,
+  "tests": [
+    {
+      "scenario": "视频播放",
+      "duration_hours": 2,
+      "battery_drain": 20
+    },
+    {
+      "scenario": "游戏",
+      "duration_hours": 1,
+      "battery_drain": 25
+    },
+    {
+      "scenario": "网页浏览",
+      "duration_hours": 3,
+      "battery_drain": 18
+    }
+  ]
+}

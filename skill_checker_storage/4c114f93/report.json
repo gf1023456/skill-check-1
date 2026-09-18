@@ -1,0 +1,511 @@
+{
+  "skill_name": "bazi-mingli",
+  "timestamp": "2026-09-02T09:54:58.643708+00:00",
+  "overall_score": 0.4292,
+  "trace": {
+    "trust": {
+      "score": 1.0,
+      "label": "可信任度",
+      "verdict": "优秀",
+      "issues": []
+    },
+    "reliability": {
+      "score": 0.65,
+      "label": "可靠性",
+      "verdict": "需修复",
+      "issues": [
+        "有 7 项依赖需适配，增加不确定性"
+      ]
+    },
+    "adaptability": {
+      "score": 0.7083,
+      "label": "适用性",
+      "verdict": "需修复",
+      "issues": [
+        "有 7 项需适配: 真太阳时与经纬度换算, 夏令时处理与提示, AST/代码执行能力（分析脚本逻辑）, 测试框架 pytest/unittest, 数学计算与历法推算, HTML 渲染（示例文件存在）, 路径引用与跨平台兼容"
+      ]
+    },
+    "convention": {
+      "score": 1.0,
+      "label": "规范性",
+      "verdict": "优秀",
+      "issues": []
+    },
+    "effectiveness": {
+      "score": 0.15,
+      "label": "有效性",
+      "verdict": "不合格",
+      "issues": [
+        "触发评测有 17 条失败，存在误触发或漏触发"
+      ]
+    },
+    "overall": 0.7017,
+    "conclusion": "不可用，需修复",
+    "conclusion_detail": "存在不合格维度，必须先修复阻塞问题后才能使用"
+  },
+  "dimensions": {
+    "trigger": {
+      "status": "checked",
+      "score": 0.15,
+      "results": [
+        {
+          "script": "scripts/liuyao.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\liuyao.py --yao 787888 --date 2026 6 15",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "缺少依赖 lunar_python，请先运行：pip3 install lunar_python\n",
+          "expected": "本卦",
+          "error": ""
+        },
+        {
+          "script": "scripts/liuyao.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\liuyao.py --gua 1 5 4 --date 2026 6 15 --query \"问合作\"",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "缺少依赖 lunar_python，请先运行：pip3 install lunar_python\n",
+          "expected": "变卦",
+          "error": ""
+        },
+        {
+          "script": "scripts/liuyao.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\liuyao.py --yao 787888 --date 2026 6 5 21 --lunar",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "usage: liuyao.py [-h] (--yao 六位数 | --gua 上卦数 下卦数 动爻) [--date Y M D [H]\n                 [Y M D [H] ...]] [--query QUERY] [--json] [--version]\nliuyao.py: error: unrecognized arguments: --lunar\n",
+          "expected": "月建",
+          "error": ""
+        },
+        {
+          "script": "scripts/liuyao.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\liuyao.py --yao 999999",
+          "success": true,
+          "passed": true,
+          "stdout": "════════════════════ 六爻 · 装卦 ════════════════════\n【本卦】乾为天　乾宫（金）　→　【变卦】坤为地\n\n  父母 壬戌土　▅▅▅▅▅ ○〔世〕　→ 癸酉金（兄弟）\n  兄弟 壬申金　▅▅▅▅▅ ○　　　　→ 癸亥水（子孙）\n  官鬼 壬午火　▅▅▅▅▅ ○　　　　→ 癸丑土（父母）\n  父母 甲辰土　▅▅▅▅▅ ○〔应〕　→ 乙卯木（妻财）\n  妻财 ",
+          "stderr": "",
+          "expected": "世应",
+          "error": ""
+        },
+        {
+          "script": "scripts/liuyao.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\liuyao.py --yao 787888 --date 2026 6 15 --json",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "缺少依赖 lunar_python，请先运行：pip3 install lunar_python\n",
+          "expected": "{\"",
+          "error": ""
+        },
+        {
+          "script": "scripts/meihua.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\meihua.py --time 2020 3 15 14 30",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "缺少依赖 lunar_python，请先运行：pip3 install lunar_python\n",
+          "expected": "本卦",
+          "error": ""
+        },
+        {
+          "script": "scripts/meihua.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\meihua.py --time 2026 6 5 14 30 --lunar",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "缺少依赖 lunar_python，请先运行：pip3 install lunar_python\n",
+          "expected": "互卦",
+          "error": ""
+        },
+        {
+          "script": "scripts/meihua.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\meihua.py --numbers 34 43",
+          "success": true,
+          "passed": true,
+          "stdout": "════════════════════ 梅花易数 · 起卦 ════════════════════\n起卦：上卦 兑(2)　下卦 离(3)　动爻 第5爻\n\n【本卦】泽火革（上泽下火）\n【互卦】天风姤（上乾下巽）　主事情发展过程\n【变卦】雷火丰（上震下离）　主结果终局\n\n【体用】动爻在上卦 → 用卦 兑(金)、体卦 离(火)\n  体代表求测者自身，用代表所占之事。\n  用卦对体：兑(金) 被克 体",
+          "stderr": "",
+          "expected": "变卦",
+          "error": ""
+        },
+        {
+          "script": "scripts/meihua.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\meihua.py --gua 2 3 1",
+          "success": true,
+          "passed": true,
+          "stdout": "════════════════════ 梅花易数 · 起卦 ════════════════════\n起卦：上卦 兑(2)　下卦 离(3)　动爻 第1爻\n\n【本卦】泽火革（上泽下火）\n【互卦】天风姤（上乾下巽）　主事情发展过程\n【变卦】泽山咸（上兑下艮）　主结果终局\n\n【体用】动爻在下卦 → 用卦 离(火)、体卦 兑(金)\n  体代表求测者自身，用代表所占之事。\n  用卦对体：离(火) 克 体兑",
+          "stderr": "",
+          "expected": "体用",
+          "error": ""
+        },
+        {
+          "script": "scripts/meihua.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\meihua.py --time 2026 6 5 23 30 --zi-sect 1 --query \"问近期求职\" --json",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "缺少依赖 lunar_python，请先运行：pip3 install lunar_python\n",
+          "expected": "\"query\"",
+          "error": ""
+        },
+        {
+          "script": "scripts/paipan.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\paipan.py 1990 5 15 14 30 --gender male",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "缺少依赖 lunar_python，请先运行：pip3 install lunar_python\n",
+          "expected": "四柱",
+          "error": ""
+        },
+        {
+          "script": "scripts/paipan.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\paipan.py 2026 4 21 14 30 --gender female --lunar",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "缺少依赖 lunar_python，请先运行：pip3 install lunar_python\n",
+          "expected": "农历",
+          "error": ""
+        },
+        {
+          "script": "scripts/paipan.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\paipan.py 2023 -2 15 14 30 --gender male --lunar",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "缺少依赖 lunar_python，请先运行：pip3 install lunar_python\n",
+          "expected": "闰",
+          "error": ""
+        },
+        {
+          "script": "scripts/paipan.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\paipan.py 1990 5 15 14 30 --gender male --lng 113.3",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "缺少依赖 lunar_python，请先运行：pip3 install lunar_python\n",
+          "expected": "时柱",
+          "error": ""
+        },
+        {
+          "script": "scripts/paipan.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\paipan.py 1990 5 15 14 30 --gender male --years 2024 12",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "缺少依赖 lunar_python，请先运行：pip3 install lunar_python\n",
+          "expected": "大运",
+          "error": ""
+        },
+        {
+          "script": "scripts/paipan.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\paipan.py 1990 5 15 14 30 --gender male --target-date 2027 3 10",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "缺少依赖 lunar_python，请先运行：pip3 install lunar_python\n",
+          "expected": "流年",
+          "error": ""
+        },
+        {
+          "script": "scripts/qimen.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\qimen.py --time 2026 6 15 14 30",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "usage: qimen.py [-h] [--zi-sect {1,2}] [--ju-fa {chaibu,zhirun}]\n                [--zhirun-leap-min {8,9}] [--json] [--version]\n                year month day hour [minute]\nqimen.py: error: unrecogniz",
+          "expected": "值符",
+          "error": ""
+        },
+        {
+          "script": "scripts/qimen.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\qimen.py --time 2026 3 20 10 30 --ju 3",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "usage: qimen.py [-h] [--zi-sect {1,2}] [--ju-fa {chaibu,zhirun}]\n                [--zhirun-leap-min {8,9}] [--json] [--version]\n                year month day hour [minute]\nqimen.py: error: argument -",
+          "expected": "八门",
+          "error": ""
+        },
+        {
+          "script": "scripts/ziwei.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\ziwei.py 2000 8 16 3 30 --gender female",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "缺少依赖 lunar_python，请先运行：pip3 install lunar_python\n",
+          "expected": "命宫",
+          "error": ""
+        },
+        {
+          "script": "scripts/ziwei.py",
+          "command": "python E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\4c114f93\\work\\HeiGe-SuanMing-main\\scripts\\ziwei.py 2000 7 17 3 30 --gender female --lunar",
+          "success": false,
+          "passed": false,
+          "stdout": "",
+          "stderr": "缺少依赖 lunar_python，请先运行：pip3 install lunar_python\n",
+          "expected": "身宫",
+          "error": ""
+        }
+      ],
+      "summary": {
+        "total": 20,
+        "passed": 3,
+        "failed": 17,
+        "pass_rate": 0.15
+      },
+      "description_used": "四柱八字与紫微斗数命理排盘推演，兼梅花易数、六爻、奇门遁甲占测。当用户提供生辰要求算命、批八字、看命盘、看紫微星盘、合婚、测运势/事业/财运/婚姻/健康、分析五行喜用神大运流年/十二宫大限小限，或要起卦占一件具体的事（梅花起卦、六爻摇卦装卦、奇门排盘起局、占卦问事求测成败）时使用。排盘、安星、起卦、装卦、排局均由脚本精确计算，推演按固定方法论逐层展开、每条断语标依据。"
+    },
+    "environment": {
+      "status": "checked",
+      "score": 0.7083,
+      "dependencies": [
+        {
+          "category": "tool",
+          "name": "python3",
+          "description": "运行所有排盘脚本（paipan.py, ziwei.py, meihua.py, liuyao.py, qimen.py）",
+          "evidence": "SKILL.md 第1步明确要求 'python3 scripts/paipan.py <年> <月> <日> <时> <分> --gender <male|female> [选项]'",
+          "compatibility": "compatible",
+          "reason": "python3 是基础解释器，当前环境必然支持（skill 文件本身即为 Python 脚本）",
+          "adaptation": {
+            "target_capability": "在任意环境运行 python3 脚本",
+            "strategy": "replace",
+            "description": "直接使用 python3 即可，sdk 环境内运行无问题",
+            "changes": []
+          }
+        },
+        {
+          "category": "capability",
+          "name": "命令行参数解析",
+          "description": "所有脚本均支持命令行参数输入（如 --gender, --lunar, --lng 等）",
+          "evidence": "SKILL.md 第1步提供大量命令行参数示例：--lunar、--lng、--tz、--years、--json、--zi-sect、--target-date、--partner 等",
+          "compatibility": "compatible",
+          "reason": "Python argparse 标准库即可实现，无需额外依赖",
+          "adaptation": {
+            "target_capability": "解析命令行参数",
+            "strategy": "extend",
+            "description": "确认 paipan.py 真正实现了所有声称的参数；若部分缺失需补充实现",
+            "changes": [
+              "核对 paipan.py 完整参数列表与 SKILL.md 声称的对照",
+              "补齐缺失参数实现"
+            ]
+          }
+        },
+        {
+          "category": "capability",
+          "name": "文件读写",
+          "description": "脚本输出结果需被读取，若 --json 模式需处理 JSON 结构；输出可能需要保存到文件供后续展示",
+          "evidence": "SKILL.md 声称 '--json：输出 JSON（需要结构化处理时）'",
+          "compatibility": "compatible",
+          "reason": "Python 原生 json 库即可读写；文件操作同理",
+          "adaptation": {
+            "target_capability": "读写 JSON 文件及文本文件",
+            "strategy": "extend",
+            "description": "确认 json 输出结构稳定可解析；若需将结果保存，使用标准文件操作即可",
+            "changes": []
+          }
+        },
+        {
+          "category": "capability",
+          "name": "中文文本处理与显示",
+          "description": "所有命盘输出、断语均为中文，需保证终端的 UTF-8 编码正常显示",
+          "evidence": "SKILL.md 输出样例全部为中文，如 '脚本输出包含：四柱干支 / 五行 / 藏干...'",
+          "compatibility": "compatible",
+          "reason": "Python 3 默认 UTF-8 编码，终端与系统环境支持中文显示",
+          "adaptation": {
+            "target_capability": "中文文本输出与显示",
+            "strategy": "extend",
+            "description": "确保脚本内 print 使用 UTF-8；若在某终端乱码，可强制设置 PYTHONIOENCODING=utf-8",
+            "changes": [
+              "增加环境变量 PYTHONIOENCODING=utf-8 或脚本内 sys.stdout.reconfigure(encoding='utf-8')"
+            ]
+          }
+        },
+        {
+          "category": "capability",
+          "name": "用户输入确认与交互",
+          "description": "SKILL.md 要求 '确认信息无误后再排盘。信息有歧义（如农历阳历不明、闰月）必须先问清'，且生辰信息需由用户提供",
+          "evidence": "SKILL.md 第0步：'确认信息无误后再排盘。信息有歧义（如农历阳历不明、闰月）必须先问清'",
+          "compatibility": "compatible",
+          "reason": "需要与用户进行多轮对话（asking 能力），当前对话环境支持",
+          "adaptation": {
+            "target_capability": "多轮用户问答与信息确认",
+            "strategy": "replace",
+            "description": "依赖当前对话框架，无额外实现需求",
+            "changes": []
+          }
+        },
+        {
+          "category": "capability",
+          "name": "真太阳时与经纬度换算",
+          "description": "根据 `--lng` 经度参数校正真太阳时，需处理时区换算、经度转时间差",
+          "evidence": "SKILL.md 提供选项 '--lng <经度>：启用真太阳时校正' 与 '--tz <时区偏移>：出生地时区（默认 +8）'",
+          "compatibility": "adaptable",
+          "reason": "需确认 paipan.py 内部是否已实现经度到时间的换算算法（常见为 每度4分钟 的简易换算）；若未实现或不够精确需修正",
+          "adaptation": {
+            "target_capability": "依据经度做真太阳时校正",
+            "strategy": "wrap",
+            "description": "若 paipan.py 为粗略实现（如 ±120分钟/时区 的跳变），在调用时先由外部脚本做修正，将修正后的时间传入 paipan.py",
+            "changes": [
+              "核对 paipan.py 中 lng 到分钟偏移的换算逻辑",
+              "确认是否为公式：偏移分钟 = (经度 - 时区中央经线经度) * 4",
+              "若实现偏差过大，在外部通过额外参数直接传入偏移分钟数"
+            ]
+          }
+        },
+        {
+          "category": "capability",
+          "name": "夏令时处理与提示",
+          "description": "SKILL.md 称 '1986-1991 年中国夏令时期出生的，脚本会提示核对钟表时间'，需按年份区间做日期判断",
+          "evidence": "SKILL.md 第1步：'1986-1991 年中国夏令时期出生的，脚本会提示核对钟表时间'",
+          "compatibility": "adaptable",
+          "reason": "判断一个公历日期是否在 1986-1991 年夏令时段内，且需要区分当年的具体起止月日，涉及中国当年立法数据；需确认脚本内包含此数据或需外部补充表",
+          "adaptation": {
+            "target_capability": "识别 1986-1991 中国夏令时日期区间",
+            "strategy": "extend",
+            "description": "查阅当年国务院通告获取具体起止日期（如 1986-05-04 至 09-14），在 paipan.py 外部做日期判断后向用户提示，再在 paipan.py 内部保留参数 --no-dst-fix",
+            "changes": [
+              "在调用层增加1986-1991 夏令时判定逻辑",
+              "增加用户提示选项：是否输入的是夏令时刻钟时间真实时间，告诉用户按钟表时间推盘（时辰不扣），否则需换算"
+            ]
+          }
+        },
+        {
+          "category": "capability",
+          "name": "AST/代码执行能力（分析脚本逻辑）",
+          "description": "验证 skill 脚本是否真正实现所有声称功能，需阅读 Python 源码或运行测试",
+          "evidence": "任务1要求对脚本做实现验证；tests/ 目录下存在 test_*.py 测试文件",
+          "compatibility": "adaptable",
+          "reason": "需动态执行 Python 代码或静态阅读源码后核对功能与参数，此过程依赖当前环境是否允许运行 python3 且可读取文件",
+          "adaptation": {
+            "target_capability": "动态运行 Python 脚本与测试",
+            "strategy": "replace",
+            "description": "直接在当前对话环境内运行命令或阅读文件内容即可",
+            "changes": []
+          }
+        },
+        {
+          "category": "capability",
+          "name": "测试框架 pytest/unittest",
+          "description": "tests/ 目录下存在 pytest 格式测试文件（test_paipan.py 等），若需做完整回归测试需用到 pytest",
+          "evidence": "实际文件列表显示 tests/test_paipan.py、tests/test_ziwei.py 等 5 个测试文件",
+          "compatibility": "adaptable",
+          "reason": "若仅需验证某项功能可不依赖 pytest；但若要批量跑测试确认脚本正确性则需要安装 pytest（requirements.txt 中是否包含未验证）",
+          "adaptation": {
+            "target_capability": "运行自动化测试",
+            "strategy": "wrap",
+            "description": "若未安装 pytest，可先以 unittest 方式手动调用，或自行安装 pytest（需确认环境允许 pip install）",
+            "changes": [
+              "确认 requirements.txt 是否包含 pytest",
+              "若不含则额外安装 pytest 或在测试命令前注明 pip install pytest"
+            ]
+          }
+        },
+        {
+          "category": "capability",
+          "name": "数学计算与历法推算",
+          "description": "干支纪年、节气划分、闰月推算、纳音计算等均为精确历法/数学计算",
+          "evidence": "SKILL.md 声称 '干支推算交给 scripts/paipan.py'，'公历 1600-2200 年'，'闰月用负数月表示'",
+          "compatibility": "adaptable",
+          "reason": "外部库可能被用于历法（如 lunardate / sxtwl）或无依赖纯手算；若纯手算逻辑在公历长区间（1600-2200）存在精度误差需补测。特别是节气划分需精确到日与时，若有微小偏差会导致月柱错误",
+          "adaptation": {
+            "target_capability": "精确计算节气、闰月等历法要素",
+            "strategy": "wrap",
+            "description": "先运行 tests/test_paipan.py 了解脚本计算准确率；若存在边界错误改用成熟的第三方库（如 sxtwl 万历）并封装输出一致接口",
+            "changes": [
+              "运行 test_paipan.py 确认全部通过",
+              "若失败，检查具体错误发生在哪类日期；必要时引入第三方历法库替代内部算法"
+            ]
+          }
+        },
+        {
+          "category": "capability",
+          "name": "HTML 渲染（示例文件存在）",
+          "description": "examples/目录下存在 '示例-八字命书.html'，暗示可能支持导出 HTML 命书；但 SKILL.md 中未提及此功能",
+          "evidence": "实际文件列表：examples\\示例-八字命书.html",
+          "compatibility": "adaptable",
+          "reason": "SKILL.md 正文未提及 '生成 HTML 命书' 的功能，故该文件可能为静态示例或演示用途；当前无法直接从脚本自动生成该 HTML，若用户要求此输出需额外实现",
+          "adaptation": {
+            "target_capability": "生成 HTML 格式的命书",
+            "strategy": "extend",
+            "description": "在 paipan.py 中新增 --html 选项，将 JSON 结果经模板渲染为 HTML；或将此需求在返回文本后告知用户可参考示例自行美化",
+            "changes": [
+              "新增 --html 参数分支",
+              "引用模板或手工拼接 HTML 字符串",
+              "建议不将资源花费在此，优先保证文本输出完整"
+            ]
+          }
+        },
+        {
+          "category": "capability",
+          "name": "路径引用与跨平台兼容",
+          "description": "skill 实际安装在不同环境，脚本路径 'scripts/paipan.py' 与文档 references/ 的相对引用需适配",
+          "evidence": "SKILL.md 多次要求 '在本 skill 所在目录下运行' 并引用 'references/' 文件",
+          "compatibility": "adaptable",
+          "reason": "若 skill 为解释器内部嵌入或打包而非物理实际目录则无法直接按相对路径找；需通过 python 读 / 写自动发现脚本实际路径",
+          "adaptation": {
+            "target_capability": "动态定位 skill 根目录及 scripts/ 子目录",
+            "strategy": "wrap",
+            "description": "在调用脚本时根据当前对话环境提供的 skill 路径参数自动补全绝对路径（如在 python 内 cwd 定位或使用 __file__）",
+            "changes": [
+              "重构调用方式：在运行前获取 skill 基础路径并拼接 scripts/paipan.py 的绝对路径"
+            ]
+          }
+        }
+      ],
+      "summary": {
+        "total": 12,
+        "compatible": 5,
+        "adaptable": 7,
+        "incompatible": 0,
+        "blocking_issues": [],
+        "adaptations_available": [
+          "真太阳时与经纬度换算",
+          "夏令时处理与提示",
+          "AST/代码执行能力（分析脚本逻辑）",
+          "测试框架 pytest/unittest",
+          "数学计算与历法推算",
+          "HTML 渲染（示例文件存在）",
+          "路径引用与跨平台兼容"
+        ],
+        "fitness_score": 0.7083,
+        "script_verification": {
+          "claimed_features": [
+            "四柱八字排盘推演",
+            "紫微斗数排盘推演",
+            "梅花易数起卦占测",
+            "六爻摇卦装卦",
+            "奇门遁甲排盘起局",
+            "合婚",
+            "真太阳时校正",
+            "流年/流月/流日干支输出",
+            "灵体命理推演（定旺衰、取用神、判格局、析岁运）",
+            "自动检出地支刑冲合会与天干合冲",
+            "五行分析与十神标注",
+            "神煞输出",
+            "大运/流年排盘",
+            "闰月处理",
+            "夏令时提示"
+          ],
+          "actual_scripts": [
+            "scripts/paipan.py",
+            "scripts/ziwei.py",
+            "scripts/meihua.py",
+            "scripts/liuyao.py",
+            "scripts/qimen.py"
+          ],
+          "missing_scripts": [],
+          "unimplemented_features": [],
+          "trust_issues": [
+            "SKILL.md 核心原则声称排盘必用脚本 paipan.py，但未说明紫微斗数、梅花易数、六爻、奇门遁甲对应脚本的存在与运行方式（仅提及脚本目录 scripts/ 下有对应脚本文件）",
+            "SKILL.md 声称 paipan.py 支持 --partner / --partner-gender / --partner-lunar 参数用于合婚，但未验证这些参数是否真正在 paipan.py 中实现",
+            "SKILL.md 声称 paipan.py 支持公历 1600-2200 年、闰月负数输入、夏令时提示等功能，但未验证实际代码是否完整实现这些功能",
+            "SKILL.md 描述中提及紫微斗数、梅花易数、六爻、奇门遁甲，但描述中未给出这四类服务的完整使用说明、运行实例或输出说明（不像八字部分那样给出明确的运行命令）",
+            "references/ 目录下包含大量文档文件，SKILL.md 中提到其中几篇为方法论依据，但这些文档内容未被验证，其准确性、完整性与实际排盘输出的一致性未确认"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,289 @@
+{
+  "skill_name": "agnes-image-video",
+  "timestamp": "2026-09-02T09:16:26.212344+00:00",
+  "overall_score": 0.4792,
+  "trace": {
+    "trust": {
+      "score": 1.0,
+      "label": "可信任度",
+      "verdict": "优秀",
+      "issues": []
+    },
+    "reliability": {
+      "score": 0.75,
+      "label": "可靠性",
+      "verdict": "需修复",
+      "issues": [
+        "有 5 项依赖需适配，增加不确定性"
+      ]
+    },
+    "adaptability": {
+      "score": 0.5833,
+      "label": "适用性",
+      "verdict": "不合格",
+      "issues": [
+        "有 5 项需适配: Agnes AI API, Python, openai SDK, HTTP 网络访问, HTTP 图像访问"
+      ]
+    },
+    "convention": {
+      "score": 1.0,
+      "label": "规范性",
+      "verdict": "优秀",
+      "issues": []
+    },
+    "effectiveness": {
+      "score": 0.375,
+      "label": "有效性",
+      "verdict": "不合格",
+      "issues": [
+        "触发评测有 5 条失败，存在误触发或漏触发"
+      ]
+    },
+    "overall": 0.7417,
+    "conclusion": "不可用，需修复",
+    "conclusion_detail": "存在不合格维度，必须先修复阻塞问题后才能使用"
+  },
+  "dimensions": {
+    "trigger": {
+      "status": "checked",
+      "score": 0.375,
+      "results": [
+        {
+          "script": "agnes_tool.py",
+          "command": "python scripts/agnes_tool.py image \"一只可爱的柴犬在樱花树下睡觉\" --size 1024x1024 --output-dir output",
+          "success": true,
+          "passed": true,
+          "stdout": "OK API Key configured\n🎨 正在生成图片...\n   Prompt: 一只可爱的柴犬在樱花树下睡觉\n   尺寸: 1024x1024\n   模型: agnes-image-2.1-flash\n\n✅ 图片生成成功!\n   URL: https://platform-outputs.agnes-ai.space/images/t2i/task_4F7TCSM7uELNoI67E9v",
+          "stderr": "",
+          "expected": "✅ 图片",
+          "error": ""
+        },
+        {
+          "script": "agnes_tool.py",
+          "command": "python scripts/agnes_tool.py image \"一只白色的猫在阳光下打盹\"",
+          "success": true,
+          "passed": true,
+          "stdout": "OK API Key configured\n🎨 正在生成图片...\n   Prompt: 一只白色的猫在阳光下打盹\n   尺寸: 1024x1024\n   模型: agnes-image-2.1-flash\n\n✅ 图片生成成功!\n   URL: https://platform-outputs.agnes-ai.space/images/t2i/task_nLrYobmdZC7Wk9LASxZCh",
+          "stderr": "",
+          "expected": "✅ 图片",
+          "error": ""
+        },
+        {
+          "script": "agnes_tool.py",
+          "command": "python scripts/agnes_tool.py edit-image \"改成水彩画风格\" \"https:/example.com/photo.png\" --size 1024x768 --output-dir output",
+          "success": false,
+          "passed": false,
+          "stdout": "OK API Key configured\n",
+          "stderr": "Traceback (most recent call last):\n  File \"E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\39a44714\\work\\agnes-image-video\\scripts\\agnes_tool.py\", lin",
+          "expected": "✅ 图片",
+          "error": ""
+        },
+        {
+          "script": "agnes_tool.py",
+          "command": "python scripts/agnes_tool.py video \"Cat playing in a sunny garden\" --width 1152 --height 768 --num-frames 121 --frame-rate 24",
+          "success": true,
+          "passed": false,
+          "stdout": "OK API Key configured\n🎬 正在创建视频任务...\n   Prompt: Cat playing in a sunny garden\n   分辨率: 1152x768\n   帧数: 121\n   帧率: 24\n   预计时长: ~5.0 秒\n   模型: agnes-video-v2.0\n\n❌ 视频生成失败: 'OpenAI' object has no attribute '",
+          "stderr": "Traceback (most recent call last):\n  File \"E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\39a44714\\work\\agnes-image-video\\scripts\\agnes_tool.py\", lin",
+          "expected": "✅ 视频",
+          "error": ""
+        },
+        {
+          "script": "agnes_tool.py",
+          "command": "python scripts/agnes_tool.py video \"Dog running through autumn leaves\" --width 1152 --height 768 --num-frames 241 --frame-rate 24",
+          "success": true,
+          "passed": false,
+          "stdout": "OK API Key configured\n🎬 正在创建视频任务...\n   Prompt: Dog running through autumn leaves\n   分辨率: 1152x768\n   帧数: 241\n   帧率: 24\n   预计时长: ~10.0 秒\n   模型: agnes-video-v2.0\n\n❌ 视频生成失败: 'OpenAI' object has no attrib",
+          "stderr": "Traceback (most recent call last):\n  File \"E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\39a44714\\work\\agnes-image-video\\scripts\\agnes_tool.py\", lin",
+          "expected": "轮询",
+          "error": ""
+        },
+        {
+          "script": "agnes_tool.py",
+          "command": "python scripts/agnes_tool.py video \"Sunrise over mountains\" --width 768 --height 768 --num-frames 49 --frame-rate 24 --output-dir videos",
+          "success": true,
+          "passed": false,
+          "stdout": "OK API Key configured\n🎬 正在创建视频任务...\n   Prompt: Sunrise over mountains\n   分辨率: 768x768\n   帧数: 49\n   帧率: 24\n   预计时长: ~2.0 秒\n   模型: agnes-video-v2.0\n\n❌ 视频生成失败: 'OpenAI' object has no attribute 'video'\n",
+          "stderr": "Traceback (most recent call last):\n  File \"E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\39a44714\\work\\agnes-image-video\\scripts\\agnes_tool.py\", lin",
+          "expected": "下载",
+          "error": ""
+        },
+        {
+          "script": "agnes_tool.py",
+          "command": "python scripts/agnes_tool.py edit-image \"提高图片亮度和对比度\" \"https:/example.com/food.jpg\"",
+          "success": false,
+          "passed": false,
+          "stdout": "OK API Key configured\n",
+          "stderr": "Traceback (most recent call last):\n  File \"E:\\sql\\skil\\web-service\\backend\\skill-check-1-feature-fastapi-skill-checker\\skill_checker_storage\\39a44714\\work\\agnes-image-video\\scripts\\agnes_tool.py\", lin",
+          "expected": "✅ 图片",
+          "error": ""
+        },
+        {
+          "script": "example.py",
+          "command": "python scripts/example.py",
+          "success": true,
+          "passed": true,
+          "stdout": "This is an example script for agnes-image-video\n",
+          "stderr": "",
+          "expected": "This is an example script for agnes-image-video",
+          "error": ""
+        }
+      ],
+      "summary": {
+        "total": 8,
+        "passed": 3,
+        "failed": 5,
+        "pass_rate": 0.375
+      },
+      "description_used": "使用 Agnes AI 的全模态 API 进行文生图、图生图、图片编辑和文生视频生成。支持 agnes-image-2.1-flash（文生图）、agnes-image-2.0-flash（图生图/编辑）和 agnes-video-v2.0（视频生成）模型。当用户需要生成图片、编辑图片、风格转换或创建视频时使用此 skill。"
+    },
+    "environment": {
+      "status": "checked",
+      "score": 0.5833,
+      "dependencies": [
+        {
+          "category": "external_service",
+          "name": "Agnes AI API",
+          "description": "Agnes AI 全模态 API，提供图像生成、图像编辑和视频生成功能",
+          "evidence": "SKILL.md 中描述 'Agnes AI 全模态 API'，'平台地址: platform.agnes-ai.com'，'Base URL: https://apihub.agnes-ai.com/v1'，'API 完全免费且无限期开放，采用 OpenAI 兼容协议'",
+          "compatibility": "adaptable",
+          "reason": "SKILL.md 中未明确说明是否需要额外的配置或环境变量来访问该 API，需要用户提供 API Key",
+          "adaptation": {
+            "target_capability": "外部 API 访问",
+            "strategy": "extend",
+            "description": "需要在环境中配置 API Key 和必要的网络访问权限",
+            "changes": [
+              "提供 API Key 的配置方法",
+              "确保网络可以访问 platform.agnes-ai.com 和 apihub.agnes-ai.com"
+            ]
+          }
+        },
+        {
+          "category": "tool",
+          "name": "Python",
+          "description": "运行 OpenAI SDK 和 Agnes AI API 客户端代码的 Python 运行环境",
+          "evidence": "SKILL.md 中使用 Python 代码示例，如 'from openai import OpenAI'，'client = OpenAI(...)'",
+          "compatibility": "adaptable",
+          "reason": "需要 Python 环境以及相关的 openai 库安装，SKILL.md 中没有安装说明，需要使用者自行准备",
+          "adaptation": {
+            "target_capability": "Python 代码运行",
+            "strategy": "extend",
+            "description": "确保 Python 环境可用，并安装 openai 库",
+            "changes": [
+              "检查 Python 版本 (建议 3.8+)",
+              "使用 pip install openai 安装依赖"
+            ]
+          }
+        },
+        {
+          "category": "tool",
+          "name": "openai SDK",
+          "description": "用于与 OpenAI 兼容的 Agnes AI API 通信的 Python 客户端库",
+          "evidence": "SKILL.md 中使用 'from openai import OpenAI'，'client.images.generate()'，'client.video.create()'",
+          "compatibility": "adaptable",
+          "reason": "需要安装 openai Python 包，且需要确认该版本支持 images.generate 和 video.create 接口",
+          "adaptation": {
+            "target_capability": "API 调用",
+            "strategy": "extend",
+            "description": "安装合适的 openai 版本",
+            "changes": [
+              "使用 pip install openai 安装最新版本",
+              "确认视频 API 的调用方式是否需要特殊配置"
+            ]
+          }
+        },
+        {
+          "category": "tool",
+          "name": "HTTP 网络访问",
+          "description": "访问 Agnes AI API 所需的网络连接",
+          "evidence": "SKILL.md 中 'Base URL: https://apihub.agnes-ai.com/v1' 和 '平台地址: platform.agnes-ai.com'",
+          "compatibility": "adaptable",
+          "reason": "需要网络环境能够访问外网 API，可能需要代理或防火墙配置",
+          "adaptation": {
+            "target_capability": "外部服务访问",
+            "strategy": "wrap",
+            "description": "确保网络可以访问目标 API 服务器",
+            "changes": [
+              "检查网络连接",
+              "如有需要配置代理或开放防火墙端口"
+            ]
+          }
+        },
+        {
+          "category": "tool",
+          "name": "HTTP 图像访问",
+          "description": "图生图功能需要访问传入的图片 URL",
+          "evidence": "SKILL.md 中图生图示例使用 'https://example.com/photo.png'",
+          "compatibility": "adaptable",
+          "reason": "需要确保图片 URL 可以直接被 Agnes API 访问，可能需要网络配置",
+          "adaptation": {
+            "target_capability": "外部图片资源访问",
+            "strategy": "extend",
+            "description": "确保提供图片的 URL 可被公开访问",
+            "changes": [
+              "验证图片 URL 可访问性",
+              "考虑图片托管的策略"
+            ]
+          }
+        },
+        {
+          "category": "tool",
+          "name": "time 模块",
+          "description": "视频生成任务中用于轮询等待的 Python 标准库",
+          "evidence": "SKILL.md 中视频生成示例使用 'import time' 和 'time.sleep(5)'",
+          "compatibility": "compatible",
+          "reason": "time 是 Python 标准库，无需额外安装",
+          "adaptation": {
+            "target_capability": "时间延迟控制",
+            "strategy": "extend",
+            "description": "无需适配，Python 环境自带",
+            "changes": []
+          }
+        }
+      ],
+      "summary": {
+        "total": 6,
+        "compatible": 1,
+        "adaptable": 5,
+        "incompatible": 0,
+        "blocking_issues": [],
+        "adaptations_available": [
+          "Agnes AI API",
+          "Python",
+          "openai SDK",
+          "HTTP 网络访问",
+          "HTTP 图像访问"
+        ],
+        "fitness_score": 0.5833,
+        "script_verification": {
+          "claimed_features": [
+            "使用 Agnes AI 的全模态 API 进行文生图",
+            "图生图生成",
+            "图片编辑",
+            "文生视频生成",
+            "支持 agnes-image-2.1-flash（文生图）模型",
+            "支持 agnes-image-2.0-flash（图生图/编辑）模型",
+            "支持 agnes-video-v2.0（视频生成）模型",
+            "高质量图像生成，支持中文 prompt，约 5 秒出图",
+            "风格转换、图片编辑、多图合成",
+            "异步任务视频生成，生成 3-5 秒视频，约 2-3 分钟",
+            "支持通过 extra_body 传递图片 URL 和标签进行图生图",
+            "支持通过 client.video.create 创建视频任务",
+            "支持轮询视频任务状态"
+          ],
+          "actual_scripts": [
+            "scripts/agnes_tool.py",
+            "scripts/example.py"
+          ],
+          "missing_scripts": [],
+          "unimplemented_features": [],
+          "trust_issues": [
+            "SKILL.md 中声称的视频 URL 字段有歧义：示例代码同时检查 video_url 和 remixed_from_video_id，但注释提到字段名是 remixed_from_video_id 而非 video_url，存在潜在字段名不一致风险",
+            "SKILL.md 声称支持中文 prompt 进行文生图，但视频生成建议使用英文 prompt，语言支持不一致",
+            "SKILL.md 中提到 '视频自动生成 AAC 音频，支持中英文对话' 以及 '在 prompt 中描述具体台词可尝试生成对应语音'，但该描述在文中被截断，没有完整说明"
+          ]
+        }
+      }
+    }
+  }
+}

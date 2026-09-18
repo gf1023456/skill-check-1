@@ -3,6 +3,11 @@
 import os
 from dataclasses import dataclass, field
 from typing import List, Optional
+from dotenv import load_dotenv
+
+# 加载 .env 文件 (config.py 在 app/core/ 下，需三次dirname到根)
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+load_dotenv(dotenv_path=os.path.join(project_root, '.env'))
 
 
 def _optional_env(name: str) -> Optional[str]:
@@ -15,7 +20,8 @@ def _csv_env(name: str) -> List[str]:
 
 @dataclass(frozen=True)
 class Settings:
-    llm_provider: str = field(default_factory=lambda: os.getenv("LLM_PROVIDER", "openai"))
+    llm_provider: str = field(default_factory=lambda: os.getenv("LLM_PROVIDER", "deepseek"))
+    llm_model: str = field(default_factory=lambda: os.getenv("LLM_MODEL", "gpt-4o-mini"))
     openai_api_key: Optional[str] = field(default_factory=lambda: _optional_env("OPENAI_API_KEY"))
     deepseek_url: Optional[str] = field(default_factory=lambda: _optional_env("DEEPSEEK_URL"))
     deepseek_api_key: Optional[str] = field(default_factory=lambda: _optional_env("DEEPSEEK_API_KEY"))
@@ -27,7 +33,7 @@ class Settings:
     local_llm_url: Optional[str] = field(default_factory=lambda: _optional_env("LOCAL_LLM_URL"))
     allow_private_network: bool = field(default_factory=lambda: os.getenv("ALLOW_PRIVATE_NETWORK", "false").lower() == "true")
     allowed_hosts: List[str] = field(default_factory=lambda: _csv_env("ALLOWED_HOSTS"))
-    storage_dir: str = field(default_factory=lambda: os.getenv("STORAGE_DIR", "/tmp/skill_checker_storage"))
+    storage_dir: str = field(default_factory=lambda: os.getenv("STORAGE_DIR", "E:\\tmp\\sc"))
 
 
 settings = Settings()

@@ -1,0 +1,178 @@
+{
+  "skill_name": "find-skills",
+  "timestamp": "2026-09-02T09:53:15.147532+00:00",
+  "overall_score": 0.6667,
+  "trace": {
+    "trust": {
+      "score": 0.8333,
+      "label": "可信任度",
+      "verdict": "良好",
+      "issues": [
+        "description 声称的功能有 1 项无对应实现: skillctl, skillctl, skillctl 工具未随技能包提供, 无法实际执行内部私有库搜索和安装"
+      ]
+    },
+    "reliability": {
+      "score": 0.9,
+      "label": "可靠性",
+      "verdict": "优秀",
+      "issues": [
+        "有 2 项依赖需适配，增加不确定性"
+      ]
+    },
+    "adaptability": {
+      "score": 0.6667,
+      "label": "适用性",
+      "verdict": "需修复",
+      "issues": [
+        "有 1 项不兼容当前环境: skillctl, skillctl, skillctl 工具未随技能包提供, 无法实际执行内部私有库搜索和安装",
+        "有 2 项需适配: npx, Google Sheets API 或等价公开技能搜索服务"
+      ]
+    },
+    "convention": {
+      "score": 1.0,
+      "label": "规范性",
+      "verdict": "优秀",
+      "issues": []
+    },
+    "effectiveness": {
+      "score": 0,
+      "label": "有效性",
+      "verdict": "不合格",
+      "issues": []
+    },
+    "overall": 0.68,
+    "conclusion": "不可用，需修复",
+    "conclusion_detail": "存在不合格维度，必须先修复阻塞问题后才能使用"
+  },
+  "dimensions": {
+    "trigger": {
+      "status": "skipped"
+    },
+    "environment": {
+      "status": "checked",
+      "score": 0.6667,
+      "dependencies": [
+        {
+          "category": "tool",
+          "name": "skillctl",
+          "description": "内部私有 Skill 市场的命令行工具，用于登录、列出和安装技能",
+          "evidence": "SKILL.md 中多处提及：'skillctl list'、'skillctl install --skill <slug>'、'skillctl login' 等",
+          "compatibility": "incompatible",
+          "reason": "skillctl 未随技能包提供，需要用户从外部项目 'dado-skills-market' 获取，当前环境无法直接使用",
+          "adaptation": {
+            "target_capability": "内部私有库技能搜索和安装",
+            "strategy": "replace",
+            "description": "用公开的 npx skills 替代 skillctl 的功能，或者指导用户先从外部获取 skillctl",
+            "changes": [
+              "需要明确告知用户必须先安装 skillctl 才能使用内部市场功能",
+              "或将内部市场的访问改为通过 API 调用实现"
+            ]
+          }
+        },
+        {
+          "category": "tool",
+          "name": "npx",
+          "description": "Node.js 包执行工具，用于运行 skills CLI 搜索和安装公开生态技能",
+          "evidence": "SKILL.md 中提及：'npx skills find'、'npx skills add <owner/repo@skill>'",
+          "compatibility": "adaptable",
+          "reason": "需要验证 Node.js 环境是否可用，若不可用则无法执行 npx 命令",
+          "adaptation": {
+            "target_capability": "公开生态技能搜索和安装",
+            "strategy": "wrap",
+            "description": "确保环境中有 Node.js，若没有则需先安装",
+            "changes": [
+              "检查是否有可用的 Node.js 运行时",
+              "如果没有，提示用户需要安装 Node.js (>= 16.x)"
+            ]
+          }
+        },
+        {
+          "category": "tool",
+          "name": "bash/shell",
+          "description": "命令行终端环境，用于执行所有技能相关的命令",
+          "evidence": "SKILL.md 中的命令示例均基于 shell 语法",
+          "compatibility": "compatible",
+          "reason": "当前运行在终端环境中，bash/shell 是基本工具",
+          "adaptation": null
+        },
+        {
+          "category": "capability",
+          "name": "用户交互",
+          "description": "需要与用户对话了解其需求，并推荐合适的技能",
+          "evidence": "SKILL.md 中的 'When to Use This Skill' 部分强调了解用户需求",
+          "compatibility": "compatible",
+          "reason": "作为 agent 技能，具备对话交互能力",
+          "adaptation": null
+        },
+        {
+          "category": "capability",
+          "name": "文件读写",
+          "description": "读取和写入技能配置文件，管理已安装的技能",
+          "evidence": "SKILL.md 提及 'npx skills add' 和 'npx skills update' 需要修改文件系统",
+          "compatibility": "compatible",
+          "reason": "环境中具备读写文件系统的能力",
+          "adaptation": null
+        },
+        {
+          "category": "external_service",
+          "name": "Google Sheets API 或等价公开技能搜索服务",
+          "description": "实际上未提及，但 npx skills 需要访问 skills.sh 或其他公开技能库作为服务",
+          "evidence": "SKILL.md 中提及：'Browse skills at: https://skills.sh/'",
+          "compatibility": "adaptable",
+          "reason": "需要网络访问 skills.sh 服务，若网络受限则无法使用",
+          "adaptation": {
+            "target_capability": "公开技能生态访问",
+            "strategy": "replace",
+            "description": "可提供离线的技能目录或使用内部 API 替代公开服务",
+            "changes": [
+              "若网络不可达，需要配置代理或使用内部镜像服务替代 skills.sh"
+            ]
+          }
+        }
+      ],
+      "summary": {
+        "total": 6,
+        "compatible": 3,
+        "adaptable": 2,
+        "incompatible": 1,
+        "blocking_issues": [
+          "skillctl",
+          "skillctl",
+          "skillctl 工具未随技能包提供",
+          "无法实际执行内部私有库搜索和安装"
+        ],
+        "adaptations_available": [
+          "npx",
+          "Google Sheets API 或等价公开技能搜索服务"
+        ],
+        "fitness_score": 0.6667,
+        "script_verification": {
+          "claimed_features": [
+            "帮助用户发现和安装技能",
+            "搜索内部私有库 (DADO-Skill-market)",
+            "通过 skillctl 登录内部市场",
+            "通过 skillctl list 列出所有技能",
+            "通过 skillctl install 安装技能",
+            "搜索公开生态技能 (skills.sh)",
+            "通过 npx skills 安装公开技能"
+          ],
+          "actual_scripts": [
+            "SKILL.md"
+          ],
+          "missing_scripts": [
+            "skillctl"
+          ],
+          "unimplemented_features": [
+            "skillctl 工具未随技能包提供",
+            "无法实际执行内部私有库搜索和安装"
+          ],
+          "trust_issues": [
+            "SKILL.md 声称可以使用 skillctl 工具，但该工具未作为脚本包含在技能目录中，仅提供了安装说明（假设用户从其他地方获取）",
+            "SKILL.md 是纯文档文件，没有任何可执行的脚本来实际执行技能声称的功能",
+            "技能声称可以搜索和安装技能，但实际上只是一个参考指南，需要用户在终端自行执行命令"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,244 @@
+{
+  "skill_name": "geo-infer-art",
+  "timestamp": "2026-09-02T09:46:27.099141+00:00",
+  "overall_score": 0.8125,
+  "trace": {
+    "trust": {
+      "score": 1.0,
+      "label": "可信任度",
+      "verdict": "优秀",
+      "issues": []
+    },
+    "reliability": {
+      "score": 0.85,
+      "label": "可靠性",
+      "verdict": "良好",
+      "issues": [
+        "有 3 项依赖需适配，增加不确定性"
+      ]
+    },
+    "adaptability": {
+      "score": 0.8125,
+      "label": "适用性",
+      "verdict": "良好",
+      "issues": [
+        "有 3 项需适配: uv, mplcursors, interactive-display"
+      ]
+    },
+    "convention": {
+      "score": 1.0,
+      "label": "规范性",
+      "verdict": "优秀",
+      "issues": []
+    },
+    "effectiveness": {
+      "score": 0,
+      "label": "有效性",
+      "verdict": "不合格",
+      "issues": []
+    },
+    "overall": 0.7325,
+    "conclusion": "不可用，需修复",
+    "conclusion_detail": "存在不合格维度，必须先修复阻塞问题后才能使用"
+  },
+  "dimensions": {
+    "trigger": {
+      "status": "skipped"
+    },
+    "environment": {
+      "status": "checked",
+      "score": 0.8125,
+      "dependencies": [
+        {
+          "category": "tool",
+          "name": "python",
+          "description": "Python runtime required for all functionality",
+          "evidence": "All examples and imports use Python syntax",
+          "compatibility": "compatible",
+          "reason": "Python is available in the environment",
+          "adaptation": {
+            "target_capability": "Core runtime",
+            "strategy": "extend",
+            "description": "Need to ensure Python is installed",
+            "changes": [
+              "Confirm Python 3.7+ is available"
+            ]
+          }
+        },
+        {
+          "category": "tool",
+          "name": "uv",
+          "description": "Package manager used for running tests",
+          "evidence": "'uv run python -m pytest GEO-INFER-ART/tests/ -v'",
+          "compatibility": "adaptable",
+          "reason": "uv may not be available but can install via pip",
+          "adaptation": {
+            "target_capability": "Test execution",
+            "strategy": "replace",
+            "description": "Use pip and pytest directly instead of uv",
+            "changes": [
+              "Replace 'uv run' with 'python -m'",
+              "Ensure all test dependencies installed via pip"
+            ]
+          }
+        },
+        {
+          "category": "capability",
+          "name": "file-write",
+          "description": "File writing capability for saving outputs and rendering",
+          "evidence": "artwork.save('output.png', dpi=300)",
+          "compatibility": "compatible",
+          "reason": "Standard file I/O available",
+          "adaptation": {
+            "target_capability": "Output persistence",
+            "strategy": "extend",
+            "description": "Ensure proper permissions and path handling",
+            "changes": [
+              "Validate output directory accessibility"
+            ]
+          }
+        },
+        {
+          "category": "external_service",
+          "name": "mplcursors",
+          "description": "Interactive hover annotations library",
+          "evidence": "Interactive features use real mplcursors + matplotlib",
+          "compatibility": "adaptable",
+          "reason": "Library may not be installed by default but it's package-based and can be added",
+          "adaptation": {
+            "target_capability": "Interactive hover tools",
+            "strategy": "extend",
+            "description": "Install mplcursors via pip/conda",
+            "changes": [
+              "Add mplcursors to requirements.txt",
+              "Verify compatibility with matplotlib"
+            ]
+          }
+        },
+        {
+          "category": "capability",
+          "name": "interactive-display",
+          "description": "Interactive map display with hover information",
+          "evidence": "artwork.show() for interactive HTML maps",
+          "compatibility": "adaptable",
+          "reason": "Interactive display requires browser/display capability which may not always exist, and implementation may depend on mplcursors integration",
+          "adaptation": {
+            "target_capability": "Interactive map display",
+            "strategy": "wrap",
+            "description": "Ensure matplotlib and mplcursors are properly integrated",
+            "changes": [
+              "Verify whether hover functionality works without need for custom cursor handling"
+            ]
+          }
+        },
+        {
+          "category": "external_service",
+          "name": "pytest",
+          "description": "Testing framework for all geo_infer_art tests",
+          "evidence": "python -m pytest GEO-INFER-ART/tests/ -v",
+          "compatibility": "compatible",
+          "reason": "Standard Python testing library",
+          "adaptation": {
+            "target_capability": "Test execution",
+            "strategy": "replace",
+            "description": "Ensure pytest installed",
+            "changes": [
+              "Include pytest in development requirements"
+            ]
+          }
+        },
+        {
+          "category": "external_service",
+          "name": "matplotlib",
+          "description": "Plotting and visualization library for geospatial rendering",
+          "evidence": "Uses matplotlib in interactive features and for creating artworks",
+          "compatibility": "compatible",
+          "reason": "Widely available library",
+          "adaptation": {
+            "target_capability": "Plotting",
+            "strategy": "extend",
+            "description": "Ensure matplotib version is compatible with mplcursors",
+            "changes": [
+              "Verify matplotlib >=3.0"
+            ]
+          }
+        },
+        {
+          "category": "external_service",
+          "name": "Pillow",
+          "description": "Image library for handling and saving image files",
+          "evidence": "artwork.save('output.png', dpi=300)",
+          "compatibility": "compatible",
+          "reason": "Standard image processing library",
+          "adaptation": {
+            "target_capability": "Image saving",
+            "strategy": "extend",
+            "description": "Ensure Pillow is installed",
+            "changes": [
+              "Add Pillow to requirements"
+            ]
+          }
+        }
+      ],
+      "summary": {
+        "total": 8,
+        "compatible": 5,
+        "adaptable": 3,
+        "incompatible": 0,
+        "blocking_issues": [
+          "src/geo_infer_art/core/cartography.py",
+          "src/geo_infer_art/core/animation.py",
+          "src/geo_infer_art/core/style.py",
+          "Interactive display feature (mplcursors) - likely using placeholder patterns like ax.plot([0],[0])",
+          "Animation sequences may not be properly implemented",
+          "Style transfer functionality may not be complete"
+        ],
+        "adaptations_available": [
+          "uv",
+          "mplcursors",
+          "interactive-display"
+        ],
+        "fitness_score": 0.8125,
+        "script_verification": {
+          "claimed_features": [
+            "Generative art",
+            "Cartographic design",
+            "Interactive display",
+            "Animation",
+            "Style transfer"
+          ],
+          "actual_scripts": [
+            "src/geo_infer_art/core/geo_art.py",
+            "src/geo_infer_art/core/cartography.py",
+            "src/geo_infer_art/core/animation.py",
+            "src/geo_infer_art/core/style.py",
+            "src/geo_infer_art/core/visualization/geo_art.py",
+            "src/geo_infer_art/core/aesthetics/style_transfer.py",
+            "src/geo_infer_art/core/visualization/map_styling.py",
+            "src/geo_infer_art/core/generation/generative_map.py",
+            "src/geo_infer_art/core/generation/procedural_art.py",
+            "src/geo_infer_art/core/place/cultural_map.py",
+            "src/geo_infer_art/core/place/place_art.py",
+            "examples/artistic_map_generation.py"
+          ],
+          "missing_scripts": [
+            "src/geo_infer_art/core/cartography.py",
+            "src/geo_infer_art/core/animation.py",
+            "src/geo_infer_art/core/style.py"
+          ],
+          "unimplemented_features": [
+            "Interactive display feature (mplcursors) - likely using placeholder patterns like ax.plot([0],[0])",
+            "Animation sequences may not be properly implemented",
+            "Style transfer functionality may not be complete"
+          ],
+          "trust_issues": [
+            "SKILL.md references cartography.py, animation.py, and style.py which don't exist",
+            "SKILL.md states 'Test: uv run python -m pytest GEO-INFER-ART/tests/ -v' but tests are structure differently",
+            "The documented imports (CartographicDesigner, SpatialAnimator, StyleTransfer) cannot be satisfied",
+            "Claims to enable mplcursors-based interactive exploration but no evidence of proper integration"
+          ]
+        }
+      }
+    }
+  }
+}

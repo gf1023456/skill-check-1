@@ -4,9 +4,12 @@ import time
 import socket
 import ipaddress
 import json
+import logging
 import httpx
 from urllib.parse import urlparse
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 PRIVATE_NETWORKS = [
     ipaddress.ip_network("10.0.0.0/8"),
@@ -41,26 +44,32 @@ class Executor:
     def prepare_and_start(self) -> bool:
         run = self.manifest.get("run")
         if not run:
+            logger.info("Manifest无run配置，跳过进程启动")
             return False
         cmd = run.get("command")
         if not cmd:
+            logger.info("Manifest无run.command，跳过进程启动")
             return False
-        # start process (production: use docker container)
+        logger.info(f"启动子进程: command={cmd}")
         self.proc = subprocess.Popen(cmd, shell=True, cwd=self.workdir, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         hc = run.get("healthcheck", {})
         if hc:
             url = hc.get("url")
             timeout = hc.get("timeout", 5)
+            logger.info(f"等待健康检查: url={url}, timeout={timeout}s")
             t0 = time.time()
             while time.time() - t0 < timeout:
                 try:
                     with httpx.Client(timeout=2) as c:
                         r = c.get(url)
                         if r.status_code < 400:
+                            logger.info(f"健康检查通过: status={r.status_code}, 耗时={time.time()-t0:.1f}s")
                             return True
                 except Exception:
                     time.sleep(0.5)
+            logger.warning(f"健康检查超时 ({timeout}s)")
             return False
+        logger.info("子进程已启动 (无健康检查)")
         return True
 
     def teardown(self):
@@ -74,7 +83,9 @@ class Executor:
     def run_manifest_tests(self):
         results = []
         entry = self.manifest.get("entrypoint", {})
-        for t in self.manifest.get("tests", []):
+        tests = self.manifest.get("tests", [])
+        logger.info(f"开始运行确定性测试: {len(tests)}个, entrypoint_type={entry.get('type')}")
+        for t in tests:
             if entry.get("type") == "http":
                 try:
                     method = entry.get("method", "POST").upper()
@@ -94,10 +105,15 @@ class Executor:
                         except Exception:
                             ok = False; reasons.append("not json")
                     results.append({"id": t.get("id"), "result": {"ok": ok, "status": r.status_code, "reasons": reasons}})
+                    logger.debug(f"测试 {t.get('id')}: ok={ok}, status={r.status_code}")
                 except Exception as e:
                     results.append({"id": t.get("id"), "result": {"ok": False, "error": str(e)}})
+                    logger.warning(f"测试 {t.get('id')} 异常: {e}")
             else:
                 results.append({"id": t.get("id"), "result": {"ok": False, "error": "unsupported entry type for tests"}})
+                logger.warning(f"测试 {t.get('id')}: 不支持的entrypoint类型 {entry.get('type')}")
+        passed = sum(1 for r in results if r.get("result", {}).get("ok"))
+        logger.info(f"确定性测试完成: {passed}/{len(results)} 通过")
         return results
 
     def _safe_url(self, url: str):
@@ -114,9 +130,12 @@ class Executor:
 
     def execute_plan(self, plan: dict):
         if not plan or not isinstance(plan, dict) or "actions" not in plan:
+            logger.info("无LLM测试计划可执行")
             return {"actions": []}
+        actions = plan.get("actions", [])
+        logger.info(f"开始执行LLM测试计划: {len(actions)}个actions")
         results = []
-        for act in plan.get("actions", []):
+        for act in actions:
             aid = act.get("id")
             typ = act.get("type")
             if typ == "http":
@@ -124,6 +143,7 @@ class Executor:
                 try:
                     self._safe_url(url)
                 except Exception as e:
+                    logger.warning(f"Action {aid}: 安全检查失败 - {e}")
                     results.append({"id": aid, "ok": False, "error": f"security: {e}"})
                     continue
                 try:
@@ -144,8 +164,13 @@ class Executor:
                         except Exception:
                             ok = False; reasons.append("response not json")
                     results.append({"id": aid, "ok": ok, "status": r.status_code, "reasons": reasons, "resp_snippet": r.text[:1000]})
+                    logger.debug(f"Action {aid}: ok={ok}, status={r.status_code}")
                 except Exception as e:
                     results.append({"id": aid, "ok": False, "error": str(e)})
+                    logger.warning(f"Action {aid} 异常: {e}")
             else:
                 results.append({"id": aid, "ok": False, "error": "unsupported action type in PoC"})
+                logger.warning(f"Action {aid}: 不支持的类型 {typ}")
+        passed = sum(1 for r in results if r.get("ok"))
+        logger.info(f"LLM测试计划执行完成: {passed}/{len(results)} 通过")
         return {"actions": results}
