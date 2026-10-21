@@ -1,0 +1,314 @@
+{
+  "skill_name": "phone-review-assistant",
+  "timestamp": "2026-09-02T08:20:43.968311+00:00",
+  "overall_score": 0.3333,
+  "trace": {
+    "trust": {
+      "score": 0.6667,
+      "label": "可信任度",
+      "verdict": "需修复",
+      "issues": [
+        "description 声称的功能有 3 项无对应实现: PIL/Pillow图像处理库, 在线跑分数据库, EXIF数据解析, analyze-photos 相关脚本（SKILL.md声称支持拍照样张分析）, compare-benchmarks 相关脚本（generate_benchmark_report.py可能对应）, 拍照样张分析功能（EXIF提取、图像质量评分）——无对应脚本, --template 参数支持（无证据表明已实现）, Markdown图表生成能力（SKILL.md声称支持条形图）, 单位标准化功能（parse_phone_specs.py需验证）"
+      ]
+    },
+    "reliability": {
+      "score": 0.85,
+      "label": "可靠性",
+      "verdict": "良好",
+      "issues": [
+        "有 3 项依赖需适配，增加不确定性"
+      ]
+    },
+    "adaptability": {
+      "score": 0.5,
+      "label": "适用性",
+      "verdict": "不合格",
+      "issues": [
+        "有 3 项不兼容当前环境: PIL/Pillow图像处理库, 在线跑分数据库, EXIF数据解析, analyze-photos 相关脚本（SKILL.md声称支持拍照样张分析）, compare-benchmarks 相关脚本（generate_benchmark_report.py可能对应）, 拍照样张分析功能（EXIF提取、图像质量评分）——无对应脚本, --template 参数支持（无证据表明已实现）, Markdown图表生成能力（SKILL.md声称支持条形图）, 单位标准化功能（parse_phone_specs.py需验证）",
+        "有 3 项需适配: Jinja2模板引擎, pandas数据处理库, Markdown模板渲染"
+      ]
+    },
+    "convention": {
+      "score": 1.0,
+      "label": "规范性",
+      "verdict": "优秀",
+      "issues": []
+    },
+    "effectiveness": {
+      "score": 0.1667,
+      "label": "有效性",
+      "verdict": "不合格",
+      "issues": [
+        "触发评测有 5 条失败，存在误触发或漏触发"
+      ]
+    },
+    "overall": 0.6367,
+    "conclusion": "不可用，需修复",
+    "conclusion_detail": "存在不合格维度，必须先修复阻塞问题后才能使用"
+  },
+  "dimensions": {
+    "trigger": {
+      "status": "checked",
+      "score": 0.1667,
+      "results": [
+        {
+          "script": "analyze_battery_test.py",
+          "command": "python scripts/analyze_battery_test.py --data battery_test.json",
+          "success": true,
+          "passed": false,
+          "stdout": "JSON解析错误: Expecting value: line 1 column 1 (char 0)\n",
+          "stderr": "",
+          "expected": "视频播放",
+          "error": ""
+        },
+        {
+          "script": "generate_benchmark_report.py",
+          "command": "python scripts/generate_benchmark_report.py --data benchmark_data.json --output report.md",
+          "success": true,
+          "passed": false,
+          "stdout": "JSON解析错误: Expecting value: line 1 column 1 (char 0)\n",
+          "stderr": "",
+          "expected": "安兔兔",
+          "error": ""
+        },
+        {
+          "script": "parse_phone_specs.py",
+          "command": "python scripts/parse_phone_specs.py --file specs.txt",
+          "success": true,
+          "passed": true,
+          "stdout": "{\n  \"processor\": \"Snapdragon 8 Gen 3\",\n  \"ram\": \"16GB\",\n  \"storage\": \"16GB\",\n  \"screen_size\": \"6.73英寸\"\n}\n",
+          "stderr": "",
+          "expected": "Snapdragon 8 Gen 3",
+          "error": ""
+        },
+        {
+          "script": "parse_phone_specs.py",
+          "command": "python scripts/parse_phone_specs.py --file specs_partial.txt",
+          "success": true,
+          "passed": false,
+          "stdout": "{}\n",
+          "stderr": "",
+          "expected": "processor",
+          "error": ""
+        },
+        {
+          "script": "generate_benchmark_report.py",
+          "command": "python scripts/generate_benchmark_report.py --data single_benchmark.json --output single_report.md",
+          "success": true,
+          "passed": false,
+          "stdout": "JSON解析错误: Expecting value: line 1 column 1 (char 0)\n",
+          "stderr": "",
+          "expected": "华为Mate60 Pro",
+          "error": ""
+        },
+        {
+          "script": "analyze_battery_test.py",
+          "command": "python scripts/analyze_battery_test.py --data empty_battery_test.json",
+          "success": true,
+          "passed": false,
+          "stdout": "JSON解析错误: Expecting value: line 1 column 1 (char 0)\n",
+          "stderr": "",
+          "expected": "error",
+          "error": ""
+        }
+      ],
+      "summary": {
+        "total": 6,
+        "passed": 1,
+        "failed": 5,
+        "pass_rate": 0.1667
+      },
+      "description_used": "AI 辅助手机评测，支持手机规格参数解析、跑分数据对比、拍照样张分析、续航测试记录，并输出 Markdown 格式的评测报告"
+    },
+    "environment": {
+      "status": "checked",
+      "score": 0.5,
+      "dependencies": [
+        {
+          "category": "tool",
+          "name": "python",
+          "description": "运行所有skill脚本所需的Python解释器",
+          "evidence": "所有脚本均为.py文件，使用#!/usr/bin/env python运行",
+          "compatibility": "compatible",
+          "reason": "当前环境支持Python脚本执行",
+          "adaptation": null
+        },
+        {
+          "category": "tool",
+          "name": "Jinja2模板引擎",
+          "description": "用于生成自定义报告的模板引擎",
+          "evidence": "SKILL.md Notes提到'--template参数指定自定义报告模板（Jinja2格式）'",
+          "compatibility": "adaptable",
+          "reason": "需要安装Python包jinja2，当前环境可能未安装",
+          "adaptation": {
+            "target_capability": "自定义报告模板渲染",
+            "strategy": "extend",
+            "description": "添加Jinja2依赖并实现模板渲染功能",
+            "changes": [
+              "在requirements.txt中添加jinja2",
+              "修改脚本支持--template及--format参数",
+              "实现模板上下文环境，传递数据给模板引擎"
+            ]
+          }
+        },
+        {
+          "category": "tool",
+          "name": "PIL/Pillow图像处理库",
+          "description": "用于读取EXIF信息、分析图像质量的Python图像库",
+          "evidence": "SKILL.md声称支持'分析拍照样张的EXIF信息和基础图像质量'",
+          "compatibility": "incompatible",
+          "reason": "当前环境不支持照片分析功能，无相关脚本",
+          "adaptation": {
+            "target_capability": "图像EXIF提取和质量评估",
+            "strategy": "extend",
+            "description": "开发新脚本analyze-photos.py，使用Pillow处理图像",
+            "changes": [
+              "安装Pillow依赖",
+              "创建scripts/analyze_photos.py脚本",
+              "实现EXIF读取、直方图分析、噪点检测功能"
+            ]
+          }
+        },
+        {
+          "category": "tool",
+          "name": "pandas数据处理库",
+          "description": "处理CSV、JSON数据，进行数据排序、筛选和统计分析",
+          "evidence": "SKILL.md声称支持CSV/JSON格式输入、自动排序和平均计算",
+          "compatibility": "adaptable",
+          "reason": "脚本可能使用pandas，但未在依赖列表中注明",
+          "adaptation": {
+            "target_capability": "数据解析、排序和统计计算",
+            "strategy": "extend",
+            "description": "确认并添加pandas依赖，或将数据操作替换为纯Python实现",
+            "changes": [
+              "在脚本头部添加import pandas验证",
+              "在requirements.txt中添加pandas",
+              "替代方案：使用标准库csv/json模块处理数据"
+            ]
+          }
+        },
+        {
+          "category": "external_service",
+          "name": "在线跑分数据库",
+          "description": "实时查询Geekbench/Antutu跑分数据的外部服务",
+          "evidence": "SKILL.md DON'T USE部分提到'访问付费跑分数据库或实时在线数据'",
+          "compatibility": "incompatible",
+          "reason": "SKILL.md明确表示不支持访问外部跑分数据库，只能处理本地数据",
+          "adaptation": null
+        },
+        {
+          "category": "capability",
+          "name": "文件系统读写",
+          "description": "读取输入文件（txt/csv/json）并写入输出Markdown文件",
+          "evidence": "各操作均涉及输入输出文件操作，如--input、--output参数",
+          "compatibility": "compatible",
+          "reason": "当前环境支持文件读写操作",
+          "adaptation": null
+        },
+        {
+          "category": "capability",
+          "name": "命令行参数解析",
+          "description": "解析CLI参数如--input、--output、--format、--metrics、--template",
+          "evidence": "SKILL.md中多个示例命令包含参数",
+          "compatibility": "compatible",
+          "reason": "Python标准库argparse即可实现",
+          "adaptation": null
+        },
+        {
+          "category": "external_service",
+          "name": "EXIF数据解析",
+          "description": "读取JPEG/PNG文件中的EXIF信息（相机参数、GPS等）",
+          "evidence": "SKILL.md声称支持'分析样张的EXIF信息'",
+          "compatibility": "incompatible",
+          "reason": "无对应脚本实现该功能，且需要Pillow等库支持",
+          "adaptation": {
+            "target_capability": "图像元数据读取",
+            "strategy": "extend",
+            "description": "开发独立的EXIF解析功能模块",
+            "changes": [
+              "安装Pillow库",
+              "创建EXIF解析脚本或集成到analyze-photos中",
+              "设置image_analysis_addon扩展钩子"
+            ]
+          }
+        },
+        {
+          "category": "external_service",
+          "name": "Markdown模板渲染",
+          "description": "使用Jinja2模板引擎生成自定义Markdown报告",
+          "evidence": "SKILL.md Notes提到'--template参数指定自定义报告模板'",
+          "compatibility": "adaptable",
+          "reason": "需要安装Jinja2并实现模板兼容层",
+          "adaptation": {
+            "target_capability": "自定义报告生成",
+            "strategy": "extend",
+            "description": "添加模板引擎支持并创建DefaultReport类",
+            "changes": [
+              "安装jinja2",
+              "创建templates系统支持jinja2模板",
+              "需满足：shell_tool_config中的template_injection存在并指向默认模板"
+            ]
+          }
+        }
+      ],
+      "summary": {
+        "total": 9,
+        "compatible": 3,
+        "adaptable": 3,
+        "incompatible": 3,
+        "blocking_issues": [
+          "PIL/Pillow图像处理库",
+          "在线跑分数据库",
+          "EXIF数据解析",
+          "analyze-photos 相关脚本（SKILL.md声称支持拍照样张分析）",
+          "compare-benchmarks 相关脚本（generate_benchmark_report.py可能对应）",
+          "拍照样张分析功能（EXIF提取、图像质量评分）——无对应脚本",
+          "--template 参数支持（无证据表明已实现）",
+          "Markdown图表生成能力（SKILL.md声称支持条形图）",
+          "单位标准化功能（parse_phone_specs.py需验证）"
+        ],
+        "adaptations_available": [
+          "Jinja2模板引擎",
+          "pandas数据处理库",
+          "Markdown模板渲染"
+        ],
+        "fitness_score": 0.5,
+        "script_verification": {
+          "claimed_features": [
+            "解析手机规格参数并输出结构化表格",
+            "对比多款手机跑分数据并生成对比表格/图表",
+            "分析拍照样张的EXIF信息和基础图像质量",
+            "记录续航测试数据并计算平均功耗",
+            "生成完整Markdown评测报告（支持--template自定义模板）",
+            "支持CSV/JSON格式跑分数据输入，自动排序并突出最高分",
+            "支持单位标准化（英寸、mAh、GHz）"
+          ],
+          "actual_scripts": [
+            "scripts/parse_phone_specs.py",
+            "scripts/analyze_battery_test.py",
+            "scripts/generate_benchmark_report.py"
+          ],
+          "missing_scripts": [
+            "analyze-photos 相关脚本（SKILL.md声称支持拍照样张分析）",
+            "compare-benchmarks 相关脚本（generate_benchmark_report.py可能对应）"
+          ],
+          "unimplemented_features": [
+            "拍照样张分析功能（EXIF提取、图像质量评分）——无对应脚本",
+            "--template 参数支持（无证据表明已实现）",
+            "Markdown图表生成能力（SKILL.md声称支持条形图）",
+            "单位标准化功能（parse_phone_specs.py需验证）"
+          ],
+          "trust_issues": [
+            "SKILL.md声称支持5种操作，但实际只有3个脚本文件",
+            "拍照样张分析（analyze-photos）声称存在但无任何脚本实现",
+            "SKILL.md声称支持--template参数，但未发现相关代码实现",
+            "--dir参数用于照片分析，但对应功能完全缺失",
+            "数据输入格式声称支持CSV和JSON，但benchmark_data.json等文件均为JSON格式，CSV支持未验证",
+            "SKILL.md中的示例命令（如compare-benchmarks）与实际脚本名称不匹配",
+            "声称输出Markdown格式报告，但generate_benchmark_report.py可能仅处理benchmark对比，不生成完整评测报告"
+          ]
+        }
+      }
+    }
+  }
+}

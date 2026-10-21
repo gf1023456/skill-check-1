@@ -1,0 +1,9 @@
+{
+  "theme_name": "Solar Sunrise",
+  "primary_color": "#FF5722",
+  "secondary_color": "#FFC107",
+  "background_color": "#FFF3E0",
+  "header_font": "Montserrat",
+  "body_font": "Roboto",
+  "target_file": "custom_theme_deck.pptx"
+}

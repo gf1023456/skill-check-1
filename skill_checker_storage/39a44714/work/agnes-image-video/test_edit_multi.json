@@ -1,0 +1,8 @@
+{
+  "mode": "edit-image",
+  "prompt": "将两张图合成一张",
+  "image_urls": [
+    "https://example.com/photo1.png",
+    "https://example.com/photo2.png"
+  ]
+}

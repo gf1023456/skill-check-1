@@ -1,0 +1,3 @@
+{
+  "text": "iPhone 15 Pro Max 配备A17 Pro处理器 8GB RAM 256GB存储 6.7英寸屏幕 48MP摄像头"
+}
